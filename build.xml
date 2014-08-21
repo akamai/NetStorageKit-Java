@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="nssdk" default="all">
+
+    <dirname property="basedir" file="${ant.file}"/>
+
+    <property name="build.dir" value="${basedir}/build"/>
+    <property name="sdk.version" value="3.51"/>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${build.dir}/classes"/>
+        <javac srcdir="src" destdir="build/classes"/>
+    </target>
+
+    <target name="jar" depends="compile" description="Generate the jar file">
+        <mkdir dir="build/jar"/>
+        <jar destfile="${build.dir}/jar/NetStorageSDK.jar" basedir="${build.dir}/classes" excludes="**/*Test.class CMS.class">
+            <manifest>
+		<section name="NetStorageSDK">
+			<attribute name="Specification-Version" value="${sdk.version}"/>
+			<attribute name="Specification-Vendor" value="Akamai"/>
+		</section>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="doc" description="Generate the javadoc for the SDK">
+        <javadoc packagenames="com.akamai.netstorage.*"
+                 sourcepath="src"
+                 defaultexcludes="yes"
+                 destdir="${build.dir}/docs"
+                 author="true"
+                 version="true"
+                 use="true"
+                 access="private"
+                 windowtitle="NetStorage SDK for Akamai HTTP CMS API">
+            <doctitle><![CDATA[<h1>NetStorage SDK for Java</h1>]]></doctitle>
+            <bottom><![CDATA[<i>Copyright &#169; 2014 Akamai Technologies, Inc. All Rights Reserved.</i>]]></bottom>
+        </javadoc>
+    </target>
+
+    <target name="cms" depends="compile">
+        <javac srcdir="example" destdir="build/classes"/>
+        <java classpath="${build.dir}/classes" classname="CMS" fork="true"/>
+    </target>
+
+    <target name="test" depends="compile">
+        <mkdir dir="${build.dir}/test"/>
+        <javac srcdir="test" destdir="${build.dir}/test">
+            <classpath>
+                <dirset dir="${build.dir}/classes"/>
+                <fileset dir="${basedir}/lib">
+                    <include name="junit-*.jar"/>
+                    <include name="hamcrest-core-*.jar"/>
+                    <exclude name="*-sources.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+        <mkdir dir="${build.dir}/junit"/>
+        <junit printsummary="yes" fork="yes" haltonfailure="yes">
+            <formatter type="plain"/>
+            <classpath>
+                <dirset dir="${build.dir}/classes"/>
+                <dirset dir="${build.dir}/test"/>
+                <fileset dir="${basedir}/lib">
+                    <include name="junit-*.jar"/>
+                    <include name="hamcrest-core-*.jar"/>
+                    <exclude name="*-sources.jar"/>
+                </fileset>
+            </classpath>
+            <batchtest todir="${build.dir}/junit">
+                <fileset dir="test">
+                    <include name="**/*Test*.java"/>
+                    <exclude name="**/*FactoryTest.java"/>
+                    <exclude name="**/AllTests.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="all" depends="clean,jar,test,doc"/>
+</project>

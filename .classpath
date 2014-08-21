@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="/NetStorageSDK/src"/>
+	<classpathentry kind="src" path="/NetStorageSDK/test"/>
+	<classpathentry kind="src" path="/NetStorageSDK/example"/>
+	<classpathentry kind="var" path="APPLICATION_HOME_DIR/lib/junit-4.10.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/junit:junit:4.11"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
