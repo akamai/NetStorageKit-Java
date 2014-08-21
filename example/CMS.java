@@ -21,8 +21,8 @@ import java.io.*;
 
 /**
  * Command Line sample application to demonstrate the utilization of the 
- * NetstorageSDK. This can be used for both command line invocation or reference
- * on how to leverage the SDK. All supported commands are implemented in this
+ * NetstorageKit. This can be used for both command line invocation or reference
+ * on how to leverage the Kit. All supported commands are implemented in this
  * sample for convience.
  * 
  * @author colinb@akamai.com (Colin Bendell)

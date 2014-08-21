@@ -1,4 +1,4 @@
-# NetStorage SDK (for Java)
+# NetStorageKit (for Java)
 
 This library assists in the interaction with Akamai's NetStorage CMS API. 
 
@@ -8,7 +8,7 @@ This library assists in the interaction with Akamai's NetStorage CMS API.
 * /out - build and output libraries
 * /doc - javadoc for class libraries
 * /lib - 3rd party dependency libraries (Currenly only necessary for running unit tests)
-* /example - an example app that utilizes the NetStorage SDK
+* /example - an example app that utilizes the NetStorageKit
 
 ## Install
 * Compile the sources from `/src` into `build/classes`.

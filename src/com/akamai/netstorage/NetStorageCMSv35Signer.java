@@ -45,8 +45,8 @@ import static com.akamai.netstorage.Utils.KeyedHashAlgorithm;
  */
 public class NetStorageCMSv35Signer {
 
-    protected static final String VERSION = "Java/3.52";
-    protected static final String SDK_HEADER = "X-Akamai-SDK";
+    protected static final String KITVERSION = "Java/3.52";
+    protected static final String KITVERSION_HEADER = "X-Akamai-NSKit";
 
     //Main headers used for communication to the API
     protected static final String ACTION_HEADER = "X-Akamai-ACS-Action";
@@ -254,7 +254,7 @@ public class NetStorageCMSv35Signer {
         final String authData = getAuthDataHeaderValue();
         final String authSign = getAuthSignHeaderValue(action, authData);
 
-        headers.put(NetStorageCMSv35Signer.SDK_HEADER, NetStorageCMSv35Signer.VERSION);
+        headers.put(NetStorageCMSv35Signer.KITVERSION_HEADER, NetStorageCMSv35Signer.KITVERSION);
         headers.put(NetStorageCMSv35Signer.ACTION_HEADER, action);
         headers.put(NetStorageCMSv35Signer.AUTH_DATA_HEADER, authData);
         headers.put(NetStorageCMSv35Signer.AUTH_SIGN_HEADER, authSign);

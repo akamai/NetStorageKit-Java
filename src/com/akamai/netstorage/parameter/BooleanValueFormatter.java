@@ -18,7 +18,7 @@ package com.akamai.netstorage.parameter;
 /**
  * Boolean Value Formatter which represents boolean values as either 1 or null. 
  * Null is used instead of Zero (0) in this case as an optimization relevant to 
- * the NetstorageSDK where parameters should be excluded if they are set to True
+ * the NetStorageKit where parameters should be excluded if they are set to True
  * 
  * @author colinb@akamai.com (Colin Bendell)
  */

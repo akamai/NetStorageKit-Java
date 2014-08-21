@@ -121,7 +121,7 @@ public class NetStorageCMSv35SignerTest {
         assertNotNull(headers.get("X-Akamai-ACS-Action"));
         assertNotNull(headers.get("X-Akamai-ACS-Auth-Data"));
         assertNotNull(headers.get("X-Akamai-ACS-Auth-Sign"));
-        assertNotNull(headers.get("X-Akamai-SDK"));
+        assertNotNull(headers.get("X-Akamai-NSKit"));
     }
 
     @Test

@@ -17,9 +17,9 @@
 
     <target name="jar" depends="compile" description="Generate the jar file">
         <mkdir dir="build/jar"/>
-        <jar destfile="${build.dir}/jar/NetStorageSDK.jar" basedir="${build.dir}/classes" excludes="**/*Test.class CMS.class">
+        <jar destfile="${build.dir}/jar/NetStorageKit.jar" basedir="${build.dir}/classes" excludes="**/*Test.class CMS.class">
             <manifest>
-		<section name="NetStorageSDK">
+		<section name="NetStorageKit">
 			<attribute name="Specification-Version" value="${sdk.version}"/>
 			<attribute name="Specification-Vendor" value="Akamai"/>
 		</section>
@@ -27,7 +27,7 @@
         </jar>
     </target>
 
-    <target name="doc" description="Generate the javadoc for the SDK">
+    <target name="doc" description="Generate the javadoc for the NetStorageKit">
         <javadoc packagenames="com.akamai.netstorage.*"
                  sourcepath="src"
                  defaultexcludes="yes"
@@ -36,8 +36,8 @@
                  version="true"
                  use="true"
                  access="private"
-                 windowtitle="NetStorage SDK for Akamai HTTP CMS API">
-            <doctitle><![CDATA[<h1>NetStorage SDK for Java</h1>]]></doctitle>
+                 windowtitle="NetStorageKit for Akamai HTTP CMS API">
+            <doctitle><![CDATA[<h1>NetStorageKit for Java</h1>]]></doctitle>
             <bottom><![CDATA[<i>Copyright &#169; 2014 Akamai Technologies, Inc. All Rights Reserved.</i>]]></bottom>
         </javadoc>
     </target>
