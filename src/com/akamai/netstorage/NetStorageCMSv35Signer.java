@@ -309,7 +309,7 @@ public class NetStorageCMSv35Signer {
                     request.setFixedLengthStreamingMode(0);
                     request.connect();
                 } else {
-                    byte[] buffer = new byte[1024^2];
+                    byte[] buffer = new byte[1024*1024];
 
                     if (this.getUploadSize() > 0)
                         request.setFixedLengthStreamingMode(this.getUploadSize());

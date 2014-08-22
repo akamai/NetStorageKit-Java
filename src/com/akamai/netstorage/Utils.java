@@ -42,7 +42,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * General utility functions needed to implement the HTTP NetStorageKit.  Many of these functions are also
+ * General utility functions needed to implement the NetStorageKit.  Many of these functions are also
  * available as standard parts of other libraries, but this package strives to operate without any
  * external dependencies.
  *
