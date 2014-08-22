@@ -160,7 +160,7 @@ public class NetStorageCMSv35SignerTest {
     @Test
     public void testValidateServerDateOutOfSync() throws Exception {
         exception.expect(NetStorageException.class);
-        exception.expectMessage("Local server Date is more than 60s out of sync with Remote server");
+        exception.expectMessage("Local server Date is more than 30s out of sync with Remote server");
         NetStorageCMSv35Signer netStorageCMSv35Signer = createAPIConnection();
         HttpURLConnectionTest httpURLConnection = new HttpURLConnectionTest(netStorageCMSv35Signer.getUrl());
         httpURLConnection.setResponseCode(HttpURLConnection.HTTP_UNAVAILABLE);
