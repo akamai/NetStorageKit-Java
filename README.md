@@ -1,11 +1,12 @@
 # NetStorageKit (for Java)
 
-This library assists in the interaction with Akamai's NetStorage CMS API. 
+This library assists in the interaction with Akamai's NetStorage CMS API. The CMS API Spec can be found at:
+https://control.akamai.com/dl/customers/NS/NetStrgHttpCM.pdf
 
 ## Project organization
 * /src - project sources
 * /test - junit test cases
-* /out - build and output libraries
+* /build - build and output libraries
 * /doc - javadoc for class libraries
 * /lib - 3rd party dependency libraries (Currenly only necessary for running unit tests)
 * /example - an example app that utilizes the NetStorageKit
@@ -52,5 +53,3 @@ try (InputStream result = ns.upload("/1234/example.zip", new File("../workingdir
 
 ```java -classpath build/classes CMS -a dir -u user1 -k 1234abcd example.akamaihd.net/1234
 ```
-
-You can also execute it through java
