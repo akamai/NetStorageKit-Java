@@ -15,11 +15,6 @@
  */
 package com.akamai.netstorage;
 
-import com.akamai.netstorage.parameter.Parameter;
-import com.akamai.netstorage.parameter.ParameterValueFormatter;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -41,8 +36,14 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import com.akamai.netstorage.parameter.Parameter;
+import com.akamai.netstorage.parameter.ParameterValueFormatter;
+
 /**
- * General utility functions needed to implement the NetStorageKit.  Many of these functions are also
+ * General utility functions needed to implement the HTTP SDK.  Many of these functions are also
  * available as standard parts of other libraries, but this package strives to operate without any
  * external dependencies.
  *
@@ -216,7 +217,7 @@ public class Utils {
                 String name = property.getName();
 
                 //getClass() should not be included;
-                if (name.equals("class")) continue;
+                if (name.equals("class") || name.equals("additionalParams")) continue;
 
                 ParameterValueFormatter formatter = null;
                 boolean includeNull = false;
@@ -284,8 +285,8 @@ public class Utils {
     public static void readToEnd(InputStream stream) throws IOException {
         if (stream == null) return;
 
-        byte[] buffer = new byte[1024^2];
-        while (stream.read(buffer) > 0) ;
+        byte[] buffer = new byte[1024 * 1024];
+        while (stream.read(buffer) > 0) {}
     }
 
 

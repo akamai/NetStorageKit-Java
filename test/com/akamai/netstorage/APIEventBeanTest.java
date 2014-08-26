@@ -15,19 +15,20 @@
  */
 package com.akamai.netstorage;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 /**
  * Unit test class for the APIEventBean
- * 
+ *
  * @author colinb@akamai.com (Colin Bendell)
  */
 public class APIEventBeanTest {
@@ -48,7 +49,6 @@ public class APIEventBeanTest {
 
         assertEquals(result.size(), 9);
         assertEquals(Utils.convertMapAsQueryParams(result), "action=download&destination=%2Ffoo&format=xml&index-zip=1&mtime=1384128000&quick-delete=imreallyreallysure&size=123&target=%2Fbar&version=1");
-        //TODO: assertEquals(Utils.convertMapAsQueryParams(result), "version=1&action=download&format=xml&quick-delete=imreallyreallysure&destination=%2Ffoo&target=%2Fbar&mtime=1384128000&size=123&index-zip=1");
 
         action = new APIEventBean();
         action.setMd5("Lorem ipsum".getBytes(StandardCharsets.UTF_8));
@@ -58,6 +58,21 @@ public class APIEventBeanTest {
 
         assertEquals(result.size(), 4);
         assertEquals(Utils.convertMapAsQueryParams(result), "md5=4c6f72656d20697073756d&sha1=4c6f72656d20697073756d&sha256=4c6f72656d20697073756d&version=1");
-        //TODO: assertEquals(Utils.convertMapAsQueryParams(result), "version=1&md5=4c6f72656d20697073756d&sha1=4c6f72656d20697073756d&sha256=4c6f72656d20697073756d");
+    }
+
+    @Test
+    public void testAdditionalParams() throws Exception {
+    	APIEventBean action = new APIEventBean();
+    	action.setAction("setmd");
+
+    	Map<String, String> headers = new HashMap<>();
+		headers.put("hdr_X-rob", "hello2");
+    	action.setAdditionalParams(headers);
+
+    	Map<String, String> result = action.asQueryParams();
+
+    	assertEquals(3, result.size());
+    	assertEquals("action=setmd&hdr_X-rob=hello2&version=1", Utils.convertMapAsQueryParams(result));
+
     }
 }

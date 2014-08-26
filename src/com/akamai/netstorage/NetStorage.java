@@ -15,22 +15,28 @@
  */
 package com.akamai.netstorage;
 
-import java.io.*;
+import static com.akamai.netstorage.Utils.readToEnd;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
-
-import static com.akamai.netstorage.Utils.readToEnd;
+import java.util.Map;
 
 /**
- * The Netstorage class is the preferred interface for calling libraries indending to leverage the Netstorage API. 
+ * The Netstorage class is the preferred interface for calling libraries indending to leverage the Netstorage API.
  * All of the available actions are innumerated in this library and are responsible for the correct business
  * logic to assemble the request to the API. Some early safetys are added in this library to limit errors.
- * 
+ *
  * TODO: Add "LIST" support for ObjectStore
  * TODO: Detect FileStore v. ObjectStore
  * TODO: Extract xml response from various requests into standard object representation
- * 
+ *
  * @author colinb@akamai.com (Colin Bendell)
  */
 public class NetStorage {
@@ -103,7 +109,7 @@ public class NetStorage {
                 size != null && size > 0 ? size : -1
                 ).execute();
     }
-    
+
     protected InputStream execute(String method, String path, APIEventBean acsParams) throws NetStorageException {
         return execute(method, path, acsParams, null, null);
     }
@@ -227,10 +233,12 @@ public class NetStorage {
         return true;
     }
 
-    public boolean Upload(String path, InputStream uploadFileStream, Date mtime, Long size, byte[] md5Checksum, byte[] sha1Checksum, byte[] sha256Checksum, boolean indexZip) throws NetStorageException, IOException {
+    public boolean Upload(String path, InputStream uploadFileStream, Map<String, String> additionalParams, Date mtime, Long size, byte[] md5Checksum, byte[] sha1Checksum, byte[] sha256Checksum, boolean indexZip) throws NetStorageException, IOException {
 
         APIEventBean action = new APIEventBean();
-        action.setAction("upload");
+
+		action.setAction("upload");
+		action.setAdditionalParams(additionalParams);
         action.setMtime(mtime);
         action.setSize(size);
         action.setMd5(md5Checksum);
@@ -255,10 +263,14 @@ public class NetStorage {
     }
 
     public boolean Upload(String path, File srcFile) throws NetStorageException, IOException {
-        return this.Upload(path, srcFile, false);
+        return this.Upload(path, srcFile, null, false);
     }
 
-    public boolean Upload(String path, File srcFile, boolean indexZip) throws NetStorageException, IOException {
+    public boolean Upload(String path, File srcFile, Map<String, String> additionalParams) throws NetStorageException, IOException {
+        return this.Upload(path, srcFile, additionalParams, false);
+    }
+
+    public boolean Upload(String path, File srcFile, Map<String, String> additionalParams, boolean indexZip) throws NetStorageException, IOException {
         if (!srcFile.exists()) throw new FileNotFoundException(String.format("Src file is not accessible %s", srcFile.toString()));
 
         Date mTime = new Date(srcFile.lastModified());
@@ -267,9 +279,22 @@ public class NetStorage {
             checksum = Utils.computeHash(inputStream, Utils.HashAlgorithm.SHA256);
         }
 
-        InputStream inputStream = new BufferedInputStream(new FileInputStream(srcFile));
-        long size = srcFile.length();
-        return this.Upload(path, inputStream, mTime, size, null, null, checksum, indexZip);
+        try (InputStream inputStream = new BufferedInputStream(new FileInputStream(srcFile));) {
+	        long size = srcFile.length();
+	        return this.Upload(path, inputStream, additionalParams, mTime, size, null, null, checksum, indexZip);
+        }
     }
+
+	public boolean setmd(String path, Map<String, String> additionalParams)  throws NetStorageException, IOException {
+
+		APIEventBean action = new APIEventBean();
+        action.setAction("setmd");
+        action.setAdditionalParams(additionalParams);
+
+        try (InputStream inputStream = execute("PUT", path, action)) {
+            readToEnd(inputStream);
+        }
+        return true;
+	}
 
 }

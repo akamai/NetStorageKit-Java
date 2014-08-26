@@ -15,17 +15,17 @@
  */
 package com.akamai.netstorage;
 
+import java.util.Date;
+import java.util.Map;
+
 import com.akamai.netstorage.parameter.BooleanValueFormatter;
 import com.akamai.netstorage.parameter.ByteArrayValueFormatter;
 import com.akamai.netstorage.parameter.DateValueFormatter;
 import com.akamai.netstorage.parameter.Parameter;
 
-import java.util.Date;
-import java.util.Map;
-
 /**
  * The APIEvent bean holds the necessary paramters for execution of the various invocation actions
- * 
+ *
  * @author colinb@akamai.com (Colin Bendell)
  */
 public class APIEventBean {
@@ -33,6 +33,7 @@ public class APIEventBean {
 
     private int version = APIEventBean.VERSION;
     private String action;
+    private Map<String, String> additionalParams;
     private String format;
     @Parameter(name="quick-delete") private String quickDelete;
     private String destination;
@@ -54,6 +55,14 @@ public class APIEventBean {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public Map<String, String> getAdditionalParams() {
+        return additionalParams;
+    }
+
+    public void setAdditionalParams(Map<String, String> additionalParams) {
+        this.additionalParams = additionalParams;
     }
 
     public String getFormat() {
@@ -137,6 +146,10 @@ public class APIEventBean {
     }
 
     public Map<String, String> asQueryParams() {
-        return Utils.convertObjectAsMap(this);
+        Map<String, String> result = Utils.convertObjectAsMap(this);
+        if (additionalParams != null && additionalParams.size() > 0)
+        	result.putAll(additionalParams);
+
+        return result;
     }
 }

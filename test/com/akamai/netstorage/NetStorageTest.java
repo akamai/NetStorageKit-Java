@@ -15,25 +15,34 @@
  */
 package com.akamai.netstorage;
 
-import org.junit.Test;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.util.*;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+
+import org.junit.Test;
+
 /**
  * Unit test class for the Netstorage wrapper
- * 
+ *
  * @author colinb@akamai.com (Colin Bendell)
  */
 public class NetStorageTest {
 
-    public NetStorage createNetstorage(String path) throws NetStorageException {
+    public NetStorage createNetstorage(String path) {
 
         URLStreamHandlerFactoryTest.init();
 
@@ -254,7 +263,7 @@ public class NetStorageTest {
 
         InputStream stream = new ByteArrayInputStream(data);
 
-        ns.Upload(path, stream, mtime, 73L, new byte[]{0}, new byte[]{1}, new byte[]{2}, false);
+        ns.Upload(path, stream, null, mtime, 73L, new byte[]{0}, new byte[]{1}, new byte[]{2}, false);
         assertEquals(headers.size(), 4);
         assertEquals(headers.get("X-Akamai-ACS-Action"), "action=upload&md5=00&mtime=1384128000&sha1=01&sha256=02&size=73&version=1");
         assertTrue(Arrays.equals(requestStream.toByteArray(), data));
@@ -267,7 +276,7 @@ public class NetStorageTest {
         requestStream = (ByteArrayOutputStream) connection.getOutputStream();
         stream = new ByteArrayInputStream(data);
 
-        ns.Upload(path, stream, mtime, 73L, null, null, null, true);
+        ns.Upload(path, stream, null, mtime, 73L, null, null, null, true);
         assertEquals(headers.get("X-Akamai-ACS-Action"), "action=upload&mtime=1384128000&size=73&version=1");
         assertTrue(Arrays.equals(requestStream.toByteArray(), data));
         assertEquals(connection.getRequestMethod(), "PUT");
@@ -279,7 +288,7 @@ public class NetStorageTest {
         headers = connection.getRequestHeaders();
         requestStream = (ByteArrayOutputStream) connection.getOutputStream();
         stream = new ByteArrayInputStream(data);
-        ns.Upload(path, stream, mtime, 73L, null, null, null, true);
+        ns.Upload(path, stream, null, mtime, 73L, null, null, null, true);
         assertEquals(headers.get("X-Akamai-ACS-Action"), "action=upload&index-zip=1&mtime=1384128000&version=1");
         assertTrue(Arrays.equals(requestStream.toByteArray(), data));
         assertEquals(connection.getRequestMethod(), "PUT");
@@ -291,12 +300,12 @@ public class NetStorageTest {
         headers = connection.getRequestHeaders();
         requestStream = (ByteArrayOutputStream) connection.getOutputStream();
         stream = new ByteArrayInputStream(data);
-        ns.Upload(path, stream, mtime, null, null, null, null, true);
+        ns.Upload(path, stream, null, mtime, null, null, null, null, true);
         assertEquals(headers.get("X-Akamai-ACS-Action"), "action=upload&index-zip=1&mtime=1384128000&version=1");
         assertTrue(Arrays.equals(requestStream.toByteArray(), data));
         assertEquals(connection.getRequestMethod(), "PUT");
         assertEquals(connection.getContentLengthLong(), -1);
-        assertEquals(connection.getChunkedLength(), 1024 ^ 2);
+        assertEquals(connection.getChunkedLength(), 1024 * 1024);
     }
 
     @Test(expected = FileNotFoundException.class)
@@ -329,7 +338,7 @@ public class NetStorageTest {
 
             // This should throw an exception
             ns = createNetstorage(path);
-            ns.Upload(path, new File(tmpFile, "doesnotexist.junk"), false);
+            ns.Upload(path, new File(tmpFile, "doesnotexist.junk"), null, false);
 
         } finally {
             if (tmpFile != null && tmpFile.exists())

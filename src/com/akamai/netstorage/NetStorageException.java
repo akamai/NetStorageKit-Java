@@ -15,14 +15,17 @@
  */
 package com.akamai.netstorage;
 
+
 /**
- * Netstorage Exceptions are intended to differenciate between IO (Networking and File) exceptions
- * 
+ * Netstorage Exceptions are intended to differentiate between IO (Networking and File) exceptions
+ *
  * @author colinb@akamai.com (Colin Bendell)
  */
 public class NetStorageException extends Exception {
 
-    public NetStorageException(String message) {
+	private static final long serialVersionUID = 1L;
+
+	public NetStorageException(String message) {
         super(message);
     }
 

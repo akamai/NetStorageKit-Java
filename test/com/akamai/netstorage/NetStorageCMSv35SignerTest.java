@@ -224,7 +224,7 @@ public class NetStorageCMSv35SignerTest {
         netStorageCMSv35Signer.execute();
         assertEquals(httpURLConnection.getRequestMethod(), "PUT");
         assertEquals(httpURLConnection.getContentLengthLong(), -1);
-        assertEquals(httpURLConnection.getChunkedLength(), 1024 ^ 2);
+        assertEquals(httpURLConnection.getChunkedLength(), 1024 * 1024);
         assertTrue(httpURLConnection.getWasConnected());
         assertTrue(httpURLConnection.getConnected());
         assertTrue(Arrays.equals(data, ((ByteArrayOutputStream) httpURLConnection.getOutputStream()).toByteArray()));

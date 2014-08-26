@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import com.akamai.netstorage.NetStorage;
 import com.akamai.netstorage.NetStorageException;
 
-import java.io.*;
-
 /**
- * Command Line sample application to demonstrate the utilization of the 
+ * Command Line sample application to demonstrate the utilization of the
  * NetstorageKit. This can be used for both command line invocation or reference
  * on how to leverage the Kit. All supported commands are implemented in this
  * sample for convience.
- * 
+ *
  * @author colinb@akamai.com (Colin Bendell)
  */
 public class CMS {
@@ -143,7 +147,7 @@ public class CMS {
                     help();
                     return;
                 }
-                success = ns.Upload(path, new File(uploadfile), indexZip);
+                success = ns.Upload(path, new File(uploadfile), null, indexZip);
                 break;
             default:
                 help();
@@ -152,18 +156,26 @@ public class CMS {
 
         if (result != null) {
             OutputStream output;
-            if (outputfile != null)
-                output = new FileOutputStream(outputfile);
-            else
-                output = System.out;
+			boolean usingStdOut;
+
+			if (outputfile != null) {
+				output = new FileOutputStream(outputfile);
+				usingStdOut = false;
+			} else {
+				output = System.out;
+				usingStdOut = true;
+			}
 
             try {
-                byte[] buffer = new byte[1024^2];
+                byte[] buffer = new byte[1024 * 1024];
                 for (int length; (length = result.read(buffer)) > 0; ) {
                     output.write(buffer, 0, length);
                 }
                 output.flush();
             } finally {
+            	if (!usingStdOut){
+            		output.close();
+            	}
                 result.close();
             }
         }
