@@ -251,7 +251,7 @@ public class NetStorageTest {
     }
 
     @Test
-    public void testUpload() throws Exception {
+    public void testupload() throws Exception {
         String path = "/foobar";
         NetStorage ns = createNetstorage(path);
         HttpURLConnectionTest connection = URLStreamHandlerFactoryTest.getURLConnection(ns.getNetstorageUri(path));
@@ -263,7 +263,7 @@ public class NetStorageTest {
 
         InputStream stream = new ByteArrayInputStream(data);
 
-        ns.Upload(path, stream, null, mtime, 73L, new byte[]{0}, new byte[]{1}, new byte[]{2}, false);
+        ns.upload(path, stream, null, mtime, 73L, new byte[]{0}, new byte[]{1}, new byte[]{2}, false);
         assertEquals(headers.size(), 4);
         assertEquals(headers.get("X-Akamai-ACS-Action"), "action=upload&md5=00&mtime=1384128000&sha1=01&sha256=02&size=73&version=1");
         assertTrue(Arrays.equals(requestStream.toByteArray(), data));
@@ -276,7 +276,7 @@ public class NetStorageTest {
         requestStream = (ByteArrayOutputStream) connection.getOutputStream();
         stream = new ByteArrayInputStream(data);
 
-        ns.Upload(path, stream, null, mtime, 73L, null, null, null, true);
+        ns.upload(path, stream, null, mtime, 73L, null, null, null, true);
         assertEquals(headers.get("X-Akamai-ACS-Action"), "action=upload&mtime=1384128000&size=73&version=1");
         assertTrue(Arrays.equals(requestStream.toByteArray(), data));
         assertEquals(connection.getRequestMethod(), "PUT");
@@ -288,7 +288,7 @@ public class NetStorageTest {
         headers = connection.getRequestHeaders();
         requestStream = (ByteArrayOutputStream) connection.getOutputStream();
         stream = new ByteArrayInputStream(data);
-        ns.Upload(path, stream, null, mtime, 73L, null, null, null, true);
+        ns.upload(path, stream, null, mtime, 73L, null, null, null, true);
         assertEquals(headers.get("X-Akamai-ACS-Action"), "action=upload&index-zip=1&mtime=1384128000&version=1");
         assertTrue(Arrays.equals(requestStream.toByteArray(), data));
         assertEquals(connection.getRequestMethod(), "PUT");
@@ -300,7 +300,7 @@ public class NetStorageTest {
         headers = connection.getRequestHeaders();
         requestStream = (ByteArrayOutputStream) connection.getOutputStream();
         stream = new ByteArrayInputStream(data);
-        ns.Upload(path, stream, null, mtime, null, null, null, null, true);
+        ns.upload(path, stream, null, mtime, null, null, null, null, true);
         assertEquals(headers.get("X-Akamai-ACS-Action"), "action=upload&index-zip=1&mtime=1384128000&version=1");
         assertTrue(Arrays.equals(requestStream.toByteArray(), data));
         assertEquals(connection.getRequestMethod(), "PUT");
@@ -328,7 +328,7 @@ public class NetStorageTest {
             Map<String, String> headers = connection.getRequestHeaders();
             ByteArrayOutputStream requestStream = (ByteArrayOutputStream) connection.getOutputStream();
 
-            ns.Upload("/foobar", tmpFile);
+            ns.upload("/foobar", tmpFile);
             assertEquals(headers.size(), 4);
             assertEquals(headers.get("X-Akamai-ACS-Action"), "action=upload&mtime=1384128000&sha256=4e8aecd6dc4c97ae55c30ef9b1e91b4829ef5871b16262b4628838a80dc0c2e2&size=73&version=1");
             //assertTrue(headers.get("X-Akamai-ACS-Action").matches("version=1&action=upload&mtime=\\d+&size=73&sha256=4e8aecd6dc4c97ae55c30ef9b1e91b4829ef5871b16262b4628838a80dc0c2e2"));
@@ -338,7 +338,7 @@ public class NetStorageTest {
 
             // This should throw an exception
             ns = createNetstorage(path);
-            ns.Upload(path, new File(tmpFile, "doesnotexist.junk"), null, false);
+            ns.upload(path, new File(tmpFile, "doesnotexist.junk"), null, false);
 
         } finally {
             if (tmpFile != null && tmpFile.exists())

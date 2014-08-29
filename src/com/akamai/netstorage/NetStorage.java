@@ -233,7 +233,11 @@ public class NetStorage {
         return true;
     }
 
-    public boolean Upload(String path, InputStream uploadFileStream, Map<String, String> additionalParams, Date mtime, Long size, byte[] md5Checksum, byte[] sha1Checksum, byte[] sha256Checksum, boolean indexZip) throws NetStorageException, IOException {
+    public boolean upload(String path, InputStream uploadFileStream) throws NetStorageException, IOException {
+    	return upload(path, uploadFileStream, null, new Date(), null, null, null, null, false);
+    }
+
+    public boolean upload(String path, InputStream uploadFileStream, Map<String, String> additionalParams, Date mtime, Long size, byte[] md5Checksum, byte[] sha1Checksum, byte[] sha256Checksum, boolean indexZip) throws NetStorageException, IOException {
 
         APIEventBean action = new APIEventBean();
 
@@ -262,15 +266,15 @@ public class NetStorage {
         return true;
     }
 
-    public boolean Upload(String path, File srcFile) throws NetStorageException, IOException {
-        return this.Upload(path, srcFile, null, false);
+    public boolean upload(String path, File srcFile) throws NetStorageException, IOException {
+        return this.upload(path, srcFile, null, false);
     }
 
-    public boolean Upload(String path, File srcFile, Map<String, String> additionalParams) throws NetStorageException, IOException {
-        return this.Upload(path, srcFile, additionalParams, false);
+    public boolean upload(String path, File srcFile, Map<String, String> additionalParams) throws NetStorageException, IOException {
+        return this.upload(path, srcFile, additionalParams, false);
     }
 
-    public boolean Upload(String path, File srcFile, Map<String, String> additionalParams, boolean indexZip) throws NetStorageException, IOException {
+    public boolean upload(String path, File srcFile, Map<String, String> additionalParams, boolean indexZip) throws NetStorageException, IOException {
         if (!srcFile.exists()) throw new FileNotFoundException(String.format("Src file is not accessible %s", srcFile.toString()));
 
         Date mTime = new Date(srcFile.lastModified());
@@ -281,7 +285,7 @@ public class NetStorage {
 
         try (InputStream inputStream = new BufferedInputStream(new FileInputStream(srcFile));) {
 	        long size = srcFile.length();
-	        return this.Upload(path, inputStream, additionalParams, mTime, size, null, null, checksum, indexZip);
+	        return this.upload(path, inputStream, additionalParams, mTime, size, null, null, checksum, indexZip);
         }
     }
 

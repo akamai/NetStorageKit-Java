@@ -147,7 +147,7 @@ public class CMS {
                     help();
                     return;
                 }
-                success = ns.Upload(path, new File(uploadfile), null, indexZip);
+                success = ns.upload(path, new File(uploadfile), null, indexZip);
                 break;
             default:
                 help();
