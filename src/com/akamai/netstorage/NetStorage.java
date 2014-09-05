@@ -237,6 +237,10 @@ public class NetStorage {
     	return upload(path, uploadFileStream, null, new Date(), null, null, null, null, false);
     }
 
+    public boolean upload(String path, InputStream uploadFileStream, Date mtime, Long size, byte[] md5Checksum, byte[] sha1Checksum, byte[] sha256Checksum, boolean indexZip) throws NetStorageException, IOException {
+    	return upload(path, uploadFileStream, null, mtime, size, md5Checksum, sha1Checksum, sha256Checksum, indexZip);
+    }
+
     public boolean upload(String path, InputStream uploadFileStream, Map<String, String> additionalParams, Date mtime, Long size, byte[] md5Checksum, byte[] sha1Checksum, byte[] sha256Checksum, boolean indexZip) throws NetStorageException, IOException {
 
         APIEventBean action = new APIEventBean();
@@ -272,6 +276,10 @@ public class NetStorage {
 
     public boolean upload(String path, File srcFile, Map<String, String> additionalParams) throws NetStorageException, IOException {
         return this.upload(path, srcFile, additionalParams, false);
+    }
+
+    public boolean upload(String path, File srcFile, boolean indexZip) throws NetStorageException, IOException {
+    	return upload(path, srcFile, null, indexZip);
     }
 
     public boolean upload(String path, File srcFile, Map<String, String> additionalParams, boolean indexZip) throws NetStorageException, IOException {
