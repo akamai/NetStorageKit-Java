@@ -14,6 +14,7 @@ https://control.akamai.com/dl/customers/NS/NetStrgHttpCM.pdf
 ## Install
 * Compile the sources from `/src` into `build/classes`.
 * An ant `build.xml` is also provided for ease of use. Common commands are: `ant compile`, `ant jar` and `ant test`
+* A maven `pom.xml` is also provided for ease of use. To install: `mvn install`
 * Both IntelliJ and Eclipse project files are available
 * the destination jar file is located in build/jar
 
