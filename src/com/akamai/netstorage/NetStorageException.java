@@ -24,12 +24,22 @@ package com.akamai.netstorage;
 public class NetStorageException extends Exception {
 
 	private static final long serialVersionUID = 1L;
+	private int responseCode = -1;
 
 	public NetStorageException(String message) {
         super(message);
     }
 
+	public NetStorageException(String message, int responseCode) {
+        super(message);
+        this.responseCode = responseCode;
+    }
+
     public NetStorageException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public int getResponseCode(){
+    	return responseCode;
     }
 }

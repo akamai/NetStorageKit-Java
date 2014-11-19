@@ -27,20 +27,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import static com.akamai.netstorage.Utils.KeyedHashAlgorithm;
+import com.akamai.netstorage.Utils.KeyedHashAlgorithm;
 
 /**
  * The NetStorageCMSv35Signer is responsible for brokering the communication between the software layer and the API. This
  * includes the signing and formatting the request appropriately so that the implementation detail is abstracted from
  * calling libraries. The intended calling library is the NetStorage class, but this layer can be called directly and is
  * offered as a convenience interface for enhanced implementations.
- * 
+ *
  * TODO: support rebinding on IO communication errors (eg: connection reset)
  * TODO: support async IO
  * TODO: support multiplexing of uploads
  * TODO: optimize and adapt throughput based on connection latency
  * TODO: support HTTP trailers for late SHA256 validation
- * 
+ *
  * @author colinb@akamai.com (Colin Bendell)
  */
 public class NetStorageCMSv35Signer {
@@ -283,7 +283,7 @@ public class NetStorageCMSv35Signer {
 
         // generic response
         throw new NetStorageException(String.format("Unexpected Response from Server: %d %s\n%s",
-                connection.getResponseCode(), connection.getResponseMessage(), connection.getHeaderFields()));
+                connection.getResponseCode(), connection.getResponseMessage(), connection.getHeaderFields()), connection.getResponseCode());
     }
 
 
