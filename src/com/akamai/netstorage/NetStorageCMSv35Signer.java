@@ -53,6 +53,18 @@ public class NetStorageCMSv35Signer {
     protected static final String AUTH_DATA_HEADER = "X-Akamai-ACS-Auth-Data";
     protected static final String AUTH_SIGN_HEADER = "X-Akamai-ACS-Auth-Sign";
 
+	/**
+	 * There are multiple types of Net Storage. The following types are
+	 * detected:
+	 * - FileStore (also known as Net Storage 3).
+	 * - ObjectStore (also known as Net Storage 4).
+	 */
+	public enum NetStorageType {
+		FileStore,
+		ObjectStore,
+		Unknown;
+	}
+
     /**
      * Currently only 3 signing hash types are supported. Each are indicated with a version. They are:
      * Hmac-MD5 = v3
@@ -286,6 +298,41 @@ public class NetStorageCMSv35Signer {
                 connection.getResponseCode(), connection.getResponseMessage(), connection.getHeaderFields()), connection.getResponseCode());
     }
 
+    /**
+     * Detect the type of Net Storage.
+     *
+     * @return The type of Net Storage.
+     * @throws NetStorageException if an error occurred during the communication.
+     */
+	public NetStorageType getNetStorageType() throws NetStorageException {
+		HttpURLConnection request = null;
+		NetStorageType netNetStorage = NetStorageType.Unknown;
+		try {
+			request = (HttpURLConnection) this.getUrl().openConnection();
+			request.setReadTimeout(10000);
+			String auth = getAuthDataHeaderValue();
+			String action = "action=stat";
+			request.setRequestProperty(NetStorageCMSv35Signer.KITVERSION_HEADER, NetStorageCMSv35Signer.KITVERSION);
+			request.setRequestProperty(NetStorageCMSv35Signer.AUTH_DATA_HEADER, auth);
+			request.setRequestProperty(NetStorageCMSv35Signer.AUTH_SIGN_HEADER, getAuthSignHeaderValue(action, auth));
+			request.setRequestProperty(NetStorageCMSv35Signer.ACTION_HEADER, action);
+			request.connect();
+			switch (request.getHeaderField("Server")) {
+				case "AkamaiNetStorage":
+					netNetStorage = NetStorageType.ObjectStore;
+					break;
+				case "Apache":
+					netNetStorage = NetStorageType.FileStore;
+					break;
+			}
+		} catch (IOException e) {
+			if (request != null) {
+				request.disconnect();
+			}
+			throw new NetStorageException("Communication Error", e);
+		}
+		return netNetStorage;
+	}
 
     /**
      * Opens the connection to Netstorage, assembles the signing headers and uploads any files.
