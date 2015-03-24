@@ -309,6 +309,7 @@ public class NetStorageCMSv35Signer {
 		NetStorageType netNetStorage = NetStorageType.Unknown;
 		try {
 			request = (HttpURLConnection) this.getUrl().openConnection();
+			request.setConnectTimeout(10000);
 			request.setReadTimeout(10000);
 			String auth = getAuthDataHeaderValue();
 			String action = "action=stat";
@@ -345,6 +346,7 @@ public class NetStorageCMSv35Signer {
         try {
             request = (HttpURLConnection) this.getUrl().openConnection();
             request.setRequestMethod(this.getMethod());
+            request.setConnectTimeout(10000);
             request.setReadTimeout(10000);
 
             for (Map.Entry<String, String> entry : this.computeHeaders().entrySet())
