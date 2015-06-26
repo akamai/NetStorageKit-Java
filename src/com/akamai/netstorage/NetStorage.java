@@ -134,8 +134,15 @@ public class NetStorage {
     }
 
     public InputStream dir(String path, String format) throws NetStorageException {
+        return dir(path, format, null);
+    }
+
+    public InputStream dir(String path, String format, Map<String, String> additionalParams) throws NetStorageException{
         APIEventBean action = new APIEventBean();
         action.setAction("dir");
+        if(null != additionalParams) {
+           action.setAdditionalParams(additionalParams);
+        }
         action.setFormat(format);
         return execute("GET", path, action);
     }
