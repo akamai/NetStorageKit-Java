@@ -287,15 +287,30 @@ public class NetStorageCMSv35Signer {
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK)
             return true;
 
-        // Validate Server-Time drift
-        Date currentDate = new Date();
-        long responseDate = connection.getHeaderFieldDate("Date", 0);
-        if (responseDate != 0 && currentDate.getTime() - responseDate > 30*1000)
-            throw new NetStorageException("Local server Date is more than 30s out of sync with Remote server");
+        NetStorageException exp = null;
+        try {
+            // Validate Server-Time drift
+            Date currentDate = new Date();
+            long responseDate = connection.getHeaderFieldDate("Date", 0);
+            if (responseDate != 0 && currentDate.getTime() - responseDate > 30*1000) {
+              exp = new NetStorageException("Local server Date is more than 30s out of sync with Remote server");
+              throw exp;
+            }
 
-        // generic response
-        throw new NetStorageException(String.format("Unexpected Response from Server: %d %s\n%s",
+            // generic response
+            exp = new NetStorageException(String.format("Unexpected Response from Server: %d %s\n%s",
                 connection.getResponseCode(), connection.getResponseMessage(), connection.getHeaderFields()), connection.getResponseCode());
+            throw exp;
+        } finally {
+            try (InputStream inputStream = connection.getErrorStream()) {
+            }
+            catch (Exception e) {
+              if(null != exp) {
+                e.addSuppressed(exp);
+              }
+              throw new NetStorageException("Unable to process error stream.",e);
+            }
+        }
     }
 
     /**
