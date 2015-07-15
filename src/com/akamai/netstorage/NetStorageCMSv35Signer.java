@@ -384,9 +384,13 @@ public class NetStorageCMSv35Signer {
 
             return request.getInputStream();
 
-        } catch (IOException e) {
-            if (request != null)
-                request.disconnect();
+        } catch (NetStorageException | IOException e) {
+            if (request != null) {
+                try (InputStream is = request.getInputStream()) {}
+                catch (IOException ioException) {}
+                try (InputStream is = request.getErrorStream()) {}
+                catch (IOException ioException) {}
+            }
             throw new NetStorageException("Communication Error", e);
         }
     }
