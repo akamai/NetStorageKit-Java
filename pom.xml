@@ -7,6 +7,16 @@
     <packaging>jar</packaging>
     <name>Akamai NetStorageKit</name>
 
+    <description>Library Kit to simplify the interaction with Akamai's NetStorage CMS API</description>
+    <url>https://github.com/akamai-open/NetStorageKit-Java</url>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <prerequisites>
         <maven>3.0</maven>
     </prerequisites>
