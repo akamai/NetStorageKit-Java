@@ -2,8 +2,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.akamai.im</groupId>
-	<version>3.51</version>
+	<groupId>com.akamai</groupId>
+	<version>3.6-SNAPSHOT</version>
 	<artifactId>NetStorageKit-Java</artifactId>
 	<packaging>jar</packaging>
 	<name>NetStorageKit for Akamai HTTP CMS API</name>
@@ -11,7 +11,6 @@
 	<prerequisites>
 		<maven>3.0</maven>
 	</prerequisites>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
