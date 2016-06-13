@@ -25,10 +25,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Map;
-import java.util.Properties;
 
 import com.akamai.netstorage.NetStorageCMSv35Signer.NetStorageType;
-import org.jcp.xml.dsig.internal.SignerOutputStream;
 
 /**
  * The Netstorage class is the preferred interface for calling libraries indending to leverage the Netstorage API.
