@@ -66,8 +66,8 @@
         </pluginManagement>
     </build>
     <scm>
-        <connection>scm:git:git@github.com:akamai-open/NetStorageKit-Java.git</connection>
-        <url>scm:git:git@github.com:akamai-open/NetStorageKit-Java.git</url>
+        <url>https://github.com/akamai-open/NetStorageKit-Java</url>
+        <connection>scm:git:git://github.com/akamai-open/NetStorageKit-Java.git</connection>
         <developerConnection>scm:git:git@github.com:akamai-open/NetStorageKit-Java.git</developerConnection>
       <tag>v3.6</tag>
   </scm>
