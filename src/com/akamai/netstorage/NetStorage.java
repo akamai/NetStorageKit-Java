@@ -19,12 +19,8 @@ import com.akamai.auth.RequestSigningException;
 
 import static com.akamai.netstorage.Utils.readToEnd;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
@@ -32,6 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.akamai.netstorage.NetStorageCMSv35Signer.NetStorageType;
+import org.jcp.xml.dsig.internal.SignerOutputStream;
 
 /**
  * The Netstorage class is the preferred interface for calling libraries indending to leverage the Netstorage API.
@@ -78,7 +75,25 @@ public class NetStorage {
     }
 
     public NetStorageType getNetStorageType() throws NetStorageException {
-    	return new NetStorageCMSv35Signer( null, getNetstorageUri(""), getUsername(), getKey(), new APIEventBean()).getNetStorageType();
+
+        try {
+            try (InputStream stream = stat("/")) {
+                if (stream instanceof SignerInputStream)
+                {
+                    HttpURLConnection request = ((SignerInputStream) stream).getHttpRequest();
+                    switch (request.getHeaderField("Server")) {
+                        case "AkamaiNetStorage":
+                            return NetStorageType.ObjectStore;
+                        case "Apache":
+                            return NetStorageType.FileStore;
+                    }
+                }
+            }
+        }
+        catch (IOException ex) {
+            throw new NetStorageException(ex);
+        }
+        return NetStorageType.Unknown;
     }
 
     protected InputStream execute(String method, String path, APIEventBean acsParams) throws NetStorageException {
