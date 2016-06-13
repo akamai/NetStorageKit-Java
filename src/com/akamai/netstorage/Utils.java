@@ -19,10 +19,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
@@ -30,11 +27,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -68,7 +65,7 @@ public class Utils {
          */
         private final String algorithm;
 
-        private HashAlgorithm(final String algorithm) {
+        HashAlgorithm(final String algorithm) {
             this.algorithm = algorithm;
         }
 
@@ -93,7 +90,7 @@ public class Utils {
          */
         private final String algorithm;
 
-        private KeyedHashAlgorithm(final String algorithm) {
+        KeyedHashAlgorithm(final String algorithm) {
             this.algorithm = algorithm;
         }
 
@@ -118,7 +115,7 @@ public class Utils {
         try {
             MessageDigest digest = MessageDigest.getInstance(hashAlgorithm.getAlgorithm());
             try (InputStream inputStream = new BufferedInputStream(srcStream)) {
-                byte[] buff = new byte[1024 ^ 2];
+                byte[] buff = new byte[1024 * 1024];
 
                 int size;
                 while ((size = inputStream.read(buff)) != -1)
@@ -289,5 +286,53 @@ public class Utils {
         while (stream.read(buffer) > 0) {}
     }
 
+    /**
+     * Convenience method to read Properties in Ini format
+     * @param srcFile File of the inputstream
+     * @param section the ini [section] name to read the properties from
+     * @return the Properties for the section
+     * @throws IOException
+     */
+    public static Properties readIniSection(File srcFile, String section) throws IOException {
+        if (!srcFile.exists()) throw new FileNotFoundException(String.format("Src file is not accessible %s", srcFile.toString()));
+        try (InputStream inputStream = new BufferedInputStream(new FileInputStream(srcFile))) {
+            return readIniSection(inputStream, section);
+        }
+    }
 
+    /**
+     * Convenience method to read Properties in Ini format
+     * @param inputStream stream
+     * @param section the ini [section] name to read the properties from
+     * @return the Properties for the section
+     * @throws IOException
+     */
+    public static Properties readIniSection(InputStream inputStream, String section) throws IOException {
+        //make sure we close the streams when we are done
+        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream)) {
+            //Very blunt instrument for reading files, probably should account for different character encodings
+            String content = new Scanner(bufferedInputStream).useDelimiter("\\Z").next();
+
+            String data = "";
+
+            Pattern regex = Pattern.compile(String.format("\\[%s\\](.+?)(\\[|\\z)", section), Pattern.DOTALL);
+            Matcher regexMatcher = regex.matcher(content);
+            if (regexMatcher.find()) {
+                data = regexMatcher.group(1);
+            }
+
+            // if the file is just a vanilla properties file without ini sections then use the whole file as is
+            if (data == "") {
+                regex = Pattern.compile("^\\[");
+                if (!regex.matcher(content).find()) {
+                    data = content;
+                }
+            }
+
+            Properties result = new Properties();
+            result.load(new StringReader(data));
+
+            return result;
+        }
+    }
 }

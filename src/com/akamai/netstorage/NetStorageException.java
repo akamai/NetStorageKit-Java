@@ -16,18 +16,24 @@
 package com.akamai.netstorage;
 
 
+import com.akamai.auth.RequestSigningException;
+
 /**
  * Netstorage Exceptions are intended to differentiate between IO (Networking and File) exceptions
  *
  * @author colinb@akamai.com (Colin Bendell)
  */
-public class NetStorageException extends Exception {
+public class NetStorageException extends RequestSigningException {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 5716437270940718895L;
 	private int responseCode = -1;
 
 	public NetStorageException(String message) {
         super(message);
+    }
+
+    public NetStorageException(Throwable cause) {
+        super(cause);
     }
 
 	public NetStorageException(String message, int responseCode) {

@@ -38,7 +38,7 @@ public class APIEventBeanTest {
         APIEventBean action = new APIEventBean();
         action.setAction("download");
         action.setFormat("xml");
-        action.setQuickDelete("imreallyreallysure");
+        action.setQuickDelete();
         action.setDestination("/foo");
         action.setTarget("/bar");
         action.setMtime(date);

@@ -27,10 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -44,13 +41,13 @@ public class NetStorageCMSv35SignerTest {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
-    public static NetStorageCMSv35Signer createAPIConnection() throws MalformedURLException {
+    private static NetStorageCMSv35Signer createAPIConnection() throws MalformedURLException {
         URLStreamHandlerFactoryTest.init();
 
         APIEventBean event = new APIEventBean();
         event.setAction("download");
 
-        return new NetStorageCMSv35Signer("GET", new URL("http://www.example.com/foobar"), "user1", "secret1", event);
+        return new NetStorageCMSv35Signer("GET", new URL("http://www.example.com/foobar"), event);
     }
 
     @Test
@@ -66,7 +63,7 @@ public class NetStorageCMSv35SignerTest {
         NetStorageCMSv35Signer apiEvent = createAPIConnection();
         apiEvent.setSignVersion(NetStorageCMSv35Signer.SignType.HMACMD5);
 
-        String authDataHeader = apiEvent.getAuthDataHeaderValue();
+        String authDataHeader = apiEvent.getAuthDataHeaderValue(new DefaultCredential("www.example.com","user1", "secret1"));
         assertTrue(authDataHeader.matches("3, 0.0.0.0, 0.0.0.0, \\d{10}, \\d+, user1"));
     }
 
@@ -75,7 +72,7 @@ public class NetStorageCMSv35SignerTest {
         NetStorageCMSv35Signer apiEvent = createAPIConnection();
         apiEvent.setSignVersion(NetStorageCMSv35Signer.SignType.HMACSHA1);
 
-        String authDataHeader = apiEvent.getAuthDataHeaderValue();
+        String authDataHeader = apiEvent.getAuthDataHeaderValue(new DefaultCredential("www.example.com","user1", "secret1"));
         assertTrue(authDataHeader.matches("4, 0.0.0.0, 0.0.0.0, \\d{10}, \\d+, user1"));
     }
 
@@ -83,7 +80,7 @@ public class NetStorageCMSv35SignerTest {
     public void testGetAuthDataHeaderValueV5() throws Exception {
         NetStorageCMSv35Signer apiEvent = createAPIConnection();
 
-        String authDataHeader = apiEvent.getAuthDataHeaderValue();
+        String authDataHeader = apiEvent.getAuthDataHeaderValue(new DefaultCredential("www.example.com","user1", "secret1"));
         assertTrue(authDataHeader.matches("5, 0.0.0.0, 0.0.0.0, \\d{10}, \\d+, user1"));
     }
 
@@ -92,7 +89,7 @@ public class NetStorageCMSv35SignerTest {
         NetStorageCMSv35Signer apiEvent = createAPIConnection();
         apiEvent.setSignVersion(NetStorageCMSv35Signer.SignType.HMACMD5);
         assertEquals(
-                apiEvent.getAuthSignHeaderValue("version=1&action=download", "5, 0.0.0.0, 0.0.0.0, 1384128000, 1234, user1"),
+                apiEvent.getAuthSignHeaderValue("version=1&action=download", "5, 0.0.0.0, 0.0.0.0, 1384128000, 1234, user1", new DefaultCredential("www.example.com","user1", "secret1")),
                 "2o9oYek9FVnDcTUykNoncg==");
     }
 
@@ -101,7 +98,7 @@ public class NetStorageCMSv35SignerTest {
         NetStorageCMSv35Signer apiEvent = createAPIConnection();
         apiEvent.setSignVersion(NetStorageCMSv35Signer.SignType.HMACSHA1);
         assertEquals(
-                apiEvent.getAuthSignHeaderValue("version=1&action=download", "5, 0.0.0.0, 0.0.0.0, 1384128000, 1234, user1"),
+                apiEvent.getAuthSignHeaderValue("version=1&action=download", "5, 0.0.0.0, 0.0.0.0, 1384128000, 1234, user1", new DefaultCredential("www.example.com","user1", "secret1")),
                 "0Eg7KoGhk4zayO1OQpvqO/xW1IU=");
     }
 
@@ -109,14 +106,14 @@ public class NetStorageCMSv35SignerTest {
     public void testGetAuthSignHeaderValueV5() throws Exception {
         NetStorageCMSv35Signer apiEvent = createAPIConnection();
         assertEquals(
-                apiEvent.getAuthSignHeaderValue("version=1&action=download", "5, 0.0.0.0, 0.0.0.0, 1384128000, 1234, user1"),
+                apiEvent.getAuthSignHeaderValue("version=1&action=download", "5, 0.0.0.0, 0.0.0.0, 1384128000, 1234, user1", new DefaultCredential("www.example.com","user1", "secret1")),
                 "jKA6Rh9lCotwbE6BRPZve1fOl67yqKnZ+Z0b048jwYo=");
     }
 
     @Test
     public void testComputeHeaders() throws Exception {
         NetStorageCMSv35Signer apiEvent = createAPIConnection();
-        Map<String, String> headers = apiEvent.computeHeaders();
+        Map<String, String> headers = apiEvent.computeHeaders(new DefaultCredential("www.example.com","user1", "secret1"));
         assertEquals(headers.size(), 4);
         assertNotNull(headers.get("X-Akamai-ACS-Action"));
         assertNotNull(headers.get("X-Akamai-ACS-Auth-Data"));
@@ -153,7 +150,7 @@ public class NetStorageCMSv35SignerTest {
         NetStorageCMSv35Signer netStorageCMSv35Signer = createAPIConnection();
         HttpURLConnectionTest httpURLConnection = new HttpURLConnectionTest(netStorageCMSv35Signer.getUrl());
         httpURLConnection.setResponseCode(HttpURLConnection.HTTP_UNAVAILABLE);
-        httpURLConnection.getHeaderFields().put("Date", Arrays.asList(dateFormat.format(calendar.getTime())));
+        httpURLConnection.getHeaderFields().put("Date", Collections.singletonList(dateFormat.format(calendar.getTime())));
         assertTrue(netStorageCMSv35Signer.validate(httpURLConnection));
     }
 
@@ -164,7 +161,7 @@ public class NetStorageCMSv35SignerTest {
         NetStorageCMSv35Signer netStorageCMSv35Signer = createAPIConnection();
         HttpURLConnectionTest httpURLConnection = new HttpURLConnectionTest(netStorageCMSv35Signer.getUrl());
         httpURLConnection.setResponseCode(HttpURLConnection.HTTP_UNAVAILABLE);
-        httpURLConnection.getHeaderFields().put("Date", Arrays.asList("Mon, 11 Nov 1918 11:00:00 GMT"));
+        httpURLConnection.getHeaderFields().put("Date", Collections.singletonList("Mon, 11 Nov 1918 11:00:00 GMT"));
         assertTrue(netStorageCMSv35Signer.validate(httpURLConnection));
     }
 
@@ -174,7 +171,7 @@ public class NetStorageCMSv35SignerTest {
         HttpURLConnectionTest httpURLConnection = URLStreamHandlerFactoryTest.addURLConnection(netStorageCMSv35Signer.getUrl());
         httpURLConnection.setResponseCode(HttpURLConnection.HTTP_OK);
 
-        netStorageCMSv35Signer.execute();
+        netStorageCMSv35Signer.execute(new DefaultCredential("www.example.com","user1", "secret1"));
         assertEquals(httpURLConnection.getRequestMethod(), "GET");
         assertEquals(httpURLConnection.getRequestHeaders().size(), 4);
         assertTrue(httpURLConnection.getWasConnected());
@@ -188,7 +185,7 @@ public class NetStorageCMSv35SignerTest {
         httpURLConnection.setResponseCode(HttpURLConnection.HTTP_OK);
         netStorageCMSv35Signer.setMethod("POST");
 
-        netStorageCMSv35Signer.execute();
+        netStorageCMSv35Signer.execute(new DefaultCredential("www.example.com","user1", "secret1"));
         assertEquals(httpURLConnection.getRequestMethod(), "POST");
         assertEquals(httpURLConnection.getContentLengthLong(), 0);
         assertTrue(httpURLConnection.getWasConnected());
@@ -204,7 +201,7 @@ public class NetStorageCMSv35SignerTest {
         netStorageCMSv35Signer.setMethod("PUT");
         netStorageCMSv35Signer.setUploadSize(data.length);
         netStorageCMSv35Signer.setUploadStream(new ByteArrayInputStream(data));
-        netStorageCMSv35Signer.execute();
+        netStorageCMSv35Signer.execute(new DefaultCredential("www.example.com","user1", "secret1"));
         assertEquals(httpURLConnection.getRequestMethod(), "PUT");
         assertEquals(httpURLConnection.getContentLengthLong(), 73);
         assertTrue(httpURLConnection.getWasConnected());
@@ -221,7 +218,7 @@ public class NetStorageCMSv35SignerTest {
         netStorageCMSv35Signer.setMethod("PUT");
         netStorageCMSv35Signer.setUploadStream(new ByteArrayInputStream(data));
 
-        netStorageCMSv35Signer.execute();
+        netStorageCMSv35Signer.execute(new DefaultCredential("www.example.com","user1", "secret1"));
         assertEquals(httpURLConnection.getRequestMethod(), "PUT");
         assertEquals(httpURLConnection.getContentLengthLong(), -1);
         assertEquals(httpURLConnection.getChunkedLength(), 1024 * 1024);
@@ -241,7 +238,7 @@ public class NetStorageCMSv35SignerTest {
 
         NetStorageException nse = null;
         try {
-            netStorageCMSv35Signer.execute();
+            netStorageCMSv35Signer.execute(new DefaultCredential("www.example.com","user1", "secret1"));
         } catch (NetStorageException e) {
             nse = e;
         }
@@ -252,9 +249,9 @@ public class NetStorageCMSv35SignerTest {
         assertFalse(httpURLConnection.getConnected());
     }
 
-    class ByteArrayInputStreamBroken extends ByteArrayInputStream {
+    private class ByteArrayInputStreamBroken extends ByteArrayInputStream {
 
-        public ByteArrayInputStreamBroken(byte[] buf) {
+        ByteArrayInputStreamBroken(byte[] buf) {
             super(buf);
         }
 

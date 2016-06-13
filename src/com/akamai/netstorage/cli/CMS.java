@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.akamai.netstorage.cli;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Properties;
 
+import com.akamai.netstorage.DefaultCredential;
 import com.akamai.netstorage.NetStorage;
 import com.akamai.netstorage.NetStorageException;
+import com.akamai.netstorage.Utils;
 
 /**
  * Command Line sample application to demonstrate the utilization of the
@@ -90,15 +94,30 @@ public class CMS {
 
     public static void execute(String action, String user, String key, String netstorageURI,
                         String uploadfile, String outputfile, String target, String dst, boolean indexZip) throws NetStorageException, IOException {
+
+        String host = null;
+        String path = netstorageURI;
+        if (netstorageURI == null || user == null || key == null) {
+
+            File credsFile = new File("~/.edgerc");
+            String section = "netstorage";
+            Properties props = Utils.readIniSection(credsFile, section);
+            host = props.getProperty(DefaultCredential.HOSTNAME_PROPERTY);
+            user = props.getProperty(DefaultCredential.USERNAME_PROPERTY);
+            key = props.getProperty(DefaultCredential.KEY_PROPERTY);
+        }
+
         if (action == null || netstorageURI == null || user == null || key == null) {
             help();
             return;
         }
 
-        String[] hostpath = netstorageURI.split("/", 2);
-        String host = hostpath[0];
-        String path = "/" + hostpath[1];
-        NetStorage ns = new NetStorage(host, user, key);
+        if (host == null) {
+            String[] hostpath = netstorageURI.split("/", 2);
+            host = hostpath[0];
+            path = "/" + hostpath[1];
+        }
+        NetStorage ns = new NetStorage(new DefaultCredential(host, user, key));
         InputStream result = null;
         boolean success = true;
 

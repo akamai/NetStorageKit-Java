@@ -42,11 +42,11 @@ import org.junit.Test;
  */
 public class NetStorageTest {
 
-    public NetStorage createNetstorage(String path) {
+    private NetStorage createNetstorage(String path) {
 
         URLStreamHandlerFactoryTest.init();
 
-        NetStorage ns = new NetStorage("www.example.com", "user1", "secret1");
+        NetStorage ns = new NetStorage(new DefaultCredential("www.example.com", "user1", "secret1"));
 
         HttpURLConnectionTest connection = URLStreamHandlerFactoryTest.addURLConnection(ns.getNetstorageUri(path));
         connection.setResponseCode(HttpURLConnection.HTTP_OK);
@@ -54,17 +54,9 @@ public class NetStorageTest {
     }
 
     @Test()
-    public void testGetNetstorageUriHttp() throws Exception {
-        // http
-        NetStorage ns = new NetStorage("www.example.com", "user1", "secret1", false);
-        assertEquals(ns.getNetstorageUri("/foobar").toString(), "http://www.example.com/foobar");
-
-    }
-
-    @Test()
     public void testGetNetstorageUriHttps() throws Exception {
         // https
-        NetStorage ns = new NetStorage("www.example.com", "user1", "secret1", true);
+        NetStorage ns = new NetStorage(new DefaultCredential("www.example.com", "user1", "secret1"));
         assertEquals(ns.getNetstorageUri("/foobar").toString(), "https://www.example.com/foobar");
 
     }
@@ -72,7 +64,7 @@ public class NetStorageTest {
     @Test()
     public void testGetNetstorageUriNoPrefix() throws Exception {
         // no / prefix
-        NetStorage ns = new NetStorage("www.example.com", "user1", "secret1", true);
+        NetStorage ns = new NetStorage(new DefaultCredential("www.example.com", "user1", "secret1"));
         assertEquals(ns.getNetstorageUri("foobar").toString(), "https://www.example.com/foobar");
     }
 

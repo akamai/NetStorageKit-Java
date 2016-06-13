@@ -20,12 +20,12 @@ import com.akamai.netstorage.parameter.Parameter;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -40,6 +40,7 @@ public class UtilsTest extends Utils {
         private String name;
         @Parameter(name = "newValue", includeNull = true)
         private String value;
+
         @Parameter(name = "newDate", formatter = DateValueFormatter.class)
         private Date date;
 
@@ -161,6 +162,58 @@ public class UtilsTest extends Utils {
 
         Utils.readToEnd(stream);
         assertEquals(stream.available(), 0);
+
+    }
+
+    @Test
+    public void testReadIniFile() throws Exception {
+        String data = "[default]\n" +
+                "name1=valueA\n" +
+                "name2=valueB\n" +
+                "[notdefault]\n" +
+                "name3=valueC\n" +
+                "name4=valueD\n";
+
+        Properties props = Utils.readIniSection(new ByteArrayInputStream(data.getBytes("UTF-8")), "default");
+        assertEquals(props.getProperty("name1"), "valueA");
+        assertTrue(props.containsKey("name2"));
+        assertFalse(props.containsKey("name3"));
+        assertFalse(props.containsKey("name4"));
+
+        props = Utils.readIniSection(new ByteArrayInputStream(data.getBytes("UTF-8")), "notdefault");
+        assertEquals(props.getProperty("name3"), "valueC");
+        assertTrue(props.containsKey("name4"));
+        assertFalse(props.containsKey("name1"));
+        assertFalse(props.containsKey("name2"));
+
+        props = Utils.readIniSection(new ByteArrayInputStream(data.getBytes("UTF-8")), "reallynotdefault");
+        assertFalse(props.containsKey("name1"));
+        assertFalse(props.containsKey("name2"));
+        assertFalse(props.containsKey("name3"));
+        assertFalse(props.containsKey("name4"));
+
+        data = "name1=valueA\n" +
+                "name2=valueB\n";
+
+        props = Utils.readIniSection(new ByteArrayInputStream(data.getBytes("UTF-8")), "default");
+        assertEquals(props.getProperty("name1"), "valueA");
+        assertTrue(props.containsKey("name2"));
+        assertFalse(props.containsKey("name3"));
+        assertFalse(props.containsKey("name4"));
+
+        File tmpFile = null;
+        try {
+            tmpFile = File.createTempFile(UUID.randomUUID().toString(), ".txt");
+            try (FileOutputStream tmpOutputStream = new FileOutputStream(tmpFile)) {
+                tmpOutputStream.write(data.getBytes(StandardCharsets.UTF_8));
+            }
+            props = Utils.readIniSection(tmpFile, "default");
+            assertEquals(props.getProperty("name1"), "valueA");
+
+        } finally {
+            if (tmpFile != null && tmpFile.exists())
+                tmpFile.delete();
+        }
 
     }
 }

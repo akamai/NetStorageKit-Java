@@ -15,6 +15,8 @@
  */
 package com.akamai.netstorage;
 
+import com.akamai.auth.RequestSigningException;
+
 import static com.akamai.netstorage.Utils.readToEnd;
 
 import java.io.BufferedInputStream;
@@ -27,6 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * The Netstorage class is the preferred interface for calling libraries indending to leverage the Netstorage API.
@@ -41,73 +44,35 @@ import java.util.Map;
  */
 public class NetStorage {
 
-    public String hostName;
-    public String username;
-    public String key;
-    public Boolean useSSL;
+    private DefaultCredential credential;
 
-    public NetStorage(String hostname, String username, String key) {
-        this(hostname, username, key, false);
-    }
-
-    public NetStorage(String hostname, String username, String key, Boolean useSSL) {
-        this.setHostName(hostname);
-        this.setUsername(username);
-        this.setKey(key);
-        this.setUseSSL(useSSL);
-    }
-
-    public String getHostName() {
-        return hostName;
-    }
-
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public Boolean getUseSSL() {
-        return useSSL;
-    }
-
-    public void setUseSSL(Boolean useSSL) {
-        this.useSSL = useSSL;
+    public NetStorage(DefaultCredential credential) {
+        this.credential = credential;
     }
 
     protected URL getNetstorageUri(String path) {
         try {
             if (!path.startsWith("/")) path = "/" + path;
-            return new URL(this.getUseSSL() ? "HTTPS" : "HTTP", this.getHostName(), path);
+            //force TLS connection
+            return new URL( "HTTPS", credential.getHostname(), path);
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("This should never Happened! Protocols are locked to HTTPS and HTTP!", e);
         }
     }
 
     protected InputStream execute(String method, String path, APIEventBean acsParams, InputStream uploadStream, Long size) throws NetStorageException {
-        return new NetStorageCMSv35Signer(
-                method,
-                this.getNetstorageUri(path),
-                this.getUsername(),
-                this.getKey(),
-                acsParams,
-                uploadStream,
-                size != null && size > 0 ? size : -1
-                ).execute();
+        try {
+            return new NetStorageCMSv35Signer(
+                    method,
+                    this.getNetstorageUri(path),
+                    acsParams,
+                    uploadStream,
+                    size != null && size > 0 ? size : -1
+            ).execute(this.credential);
+        }
+        catch (RequestSigningException ex) {
+            throw new NetStorageException(ex);
+        }
     }
 
     protected InputStream execute(String method, String path, APIEventBean acsParams) throws NetStorageException {
@@ -225,7 +190,7 @@ public class NetStorage {
     public boolean quickDelete(String path) throws NetStorageException, IOException {
         APIEventBean action = new APIEventBean();
         action.setAction("quick-delete");
-        action.setQuickDelete("imreallyreallysure");
+        action.setQuickDelete();
 
         try (InputStream inputStream = execute("PUT", path, action)) {
             readToEnd(inputStream);
@@ -291,7 +256,7 @@ public class NetStorage {
             checksum = Utils.computeHash(inputStream, Utils.HashAlgorithm.SHA256);
         }
 
-        try (InputStream inputStream = new BufferedInputStream(new FileInputStream(srcFile));) {
+        try (InputStream inputStream = new BufferedInputStream(new FileInputStream(srcFile))) {
 	        long size = srcFile.length();
 	        return this.upload(path, inputStream, additionalParams, mTime, size, null, null, checksum, indexZip);
         }

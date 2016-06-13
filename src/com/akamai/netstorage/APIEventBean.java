@@ -77,8 +77,8 @@ public class APIEventBean {
         return quickDelete;
     }
 
-    public void setQuickDelete(String quickDelete) {
-        this.quickDelete = quickDelete;
+    public void setQuickDelete() {
+        this.quickDelete = "imreallyreallysure";
     }
 
     public String getDestination() {
