@@ -99,7 +99,7 @@ public class CMS {
         String path = netstorageURI;
         if (netstorageURI == null || user == null || key == null) {
 
-            File credsFile = new File("~/.edgerc");
+            File credsFile = new File(System.getProperty("user.home") + File.separator + ".edgerc");
             String section = "netstorage";
             Properties props = Utils.readIniSection(credsFile, section);
             host = props.getProperty(DefaultCredential.HOSTNAME_PROPERTY);
