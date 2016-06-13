@@ -56,6 +56,18 @@ public class NetStorageCMSv35Signer implements RequestSigner {
     private static final String AUTH_DATA_HEADER = "X-Akamai-ACS-Auth-Data";
     private static final String AUTH_SIGN_HEADER = "X-Akamai-ACS-Auth-Sign";
 
+	/**
+	 * There are multiple types of Net Storage. The following types are
+	 * detected:
+	 * - FileStore (also known as Net Storage 3).
+	 * - ObjectStore (also known as Net Storage 4).
+	 */
+	public enum NetStorageType {
+		FileStore,
+		ObjectStore,
+		Unknown;
+	}
+
     /**
      * Currently only 3 signing hash types are supported. Each are indicated with a version. They are:
      * Hmac-MD5 = v3
@@ -266,7 +278,6 @@ public class NetStorageCMSv35Signer implements RequestSigner {
                 connection.getResponseCode(), connection.getResponseMessage(), connection.getHeaderFields()), connection.getResponseCode());
     }
 
-
     /**
      * @param request    the request to sign.
      * @param credential the credential used in the signing.
@@ -299,8 +310,8 @@ public class NetStorageCMSv35Signer implements RequestSigner {
      */
     public InputStream execute(HttpURLConnection request, ClientCredential credential) throws RequestSigningException {
         try {
-
             request = sign(request, credential);
+            request.setConnectTimeout(10000);
             request.setReadTimeout(10000);
 
             if (this.getMethod().equals("PUT") || this.getMethod().equals("POST")) {
@@ -333,11 +344,15 @@ public class NetStorageCMSv35Signer implements RequestSigner {
 
             validate(request);
 
-            return request.getInputStream();
+            return new SignerInputStream(request.getInputStream(), request);
 
-        } catch (IOException e) {
-            if (request != null)
-                request.disconnect();
+        } catch (NetStorageException | IOException e) {
+            if (request != null) {
+                try (InputStream is = request.getInputStream()) {}
+                catch (IOException ioException) {}
+                try (InputStream is = request.getErrorStream()) {}
+                catch (IOException ioException) {}
+            }
             throw new NetStorageException("Communication Error", e);
         }
     }
@@ -345,4 +360,18 @@ public class NetStorageCMSv35Signer implements RequestSigner {
     public InputStream execute(ClientCredential credential) throws RequestSigningException {
         return execute(null, credential);
     }
+}
+
+class SignerInputStream extends BufferedInputStream
+{
+    HttpURLConnection request;
+    public SignerInputStream(InputStream stream, HttpURLConnection request) {
+        super(stream);
+        this.request = request;
+    }
+
+    public HttpURLConnection getHttpRequest() {
+        return request;
+    }
+
 }

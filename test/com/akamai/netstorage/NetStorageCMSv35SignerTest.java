@@ -246,7 +246,6 @@ public class NetStorageCMSv35SignerTest {
         assertEquals(nse.getMessage(), "Communication Error");
         assertEquals(nse.getCause().getClass(), IOException.class);
         assertTrue(httpURLConnection.getWasConnected());
-        assertFalse(httpURLConnection.getConnected());
     }
 
     private class ByteArrayInputStreamBroken extends ByteArrayInputStream {

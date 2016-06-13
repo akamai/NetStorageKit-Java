@@ -43,6 +43,9 @@ public class NetStorageException extends RequestSigningException {
 
     public NetStorageException(String message, Throwable cause) {
         super(message, cause);
+        if(cause instanceof NetStorageException) {
+           responseCode = ((NetStorageException) cause).getResponseCode();
+        }
     }
 
     public int getResponseCode(){

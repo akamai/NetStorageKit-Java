@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
+import com.akamai.netstorage.NetStorageCMSv35Signer.NetStorageType;
+
 /**
  * The Netstorage class is the preferred interface for calling libraries indending to leverage the Netstorage API.
  * All of the available actions are innumerated in this library and are responsible for the correct business
@@ -75,6 +77,10 @@ public class NetStorage {
         }
     }
 
+    public NetStorageType getNetStorageType() throws NetStorageException {
+    	return new NetStorageCMSv35Signer( null, getNetstorageUri(""), getUsername(), getKey(), new APIEventBean()).getNetStorageType();
+    }
+
     protected InputStream execute(String method, String path, APIEventBean acsParams) throws NetStorageException {
         return execute(method, path, acsParams, null, null);
     }
@@ -93,8 +99,15 @@ public class NetStorage {
     }
 
     public InputStream dir(String path, String format) throws NetStorageException {
+        return dir(path, format, null);
+    }
+
+    public InputStream dir(String path, String format, Map<String, String> additionalParams) throws NetStorageException{
         APIEventBean action = new APIEventBean();
         action.setAction("dir");
+        if(null != additionalParams) {
+           action.setAdditionalParams(additionalParams);
+        }
         action.setFormat(format);
         return execute("GET", path, action);
     }
