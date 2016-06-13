@@ -4,9 +4,9 @@
 
     <groupId>com.akamai</groupId>
     <version>3.6-SNAPSHOT</version>
-    <artifactId>NetStorageKit-Java</artifactId>
+    <artifactId>NetStorageKit</artifactId>
     <packaging>jar</packaging>
-    <name>NetStorageKit for Akamai HTTP CMS API</name>
+    <name>Akamai NetStorageKit</name>
 
     <prerequisites>
         <maven>3.0</maven>
