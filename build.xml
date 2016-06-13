@@ -4,7 +4,7 @@
     <dirname property="basedir" file="${ant.file}"/>
 
     <property name="build.dir" value="${basedir}/build"/>
-    <property name="sdk.version" value="3.51"/>
+    <property name="sdk.version" value="3.6"/>
 
     <target name="clean">
         <delete dir="${build.dir}"/>
@@ -47,39 +47,6 @@
         <java classpath="${build.dir}/classes" classname="CMS" fork="true"/>
     </target>
 
-    <target name="test" depends="compile">
-        <mkdir dir="${build.dir}/test"/>
-        <javac srcdir="test" destdir="${build.dir}/test">
-            <classpath>
-                <dirset dir="${build.dir}/classes"/>
-                <fileset dir="${basedir}/lib">
-                    <include name="junit-*.jar"/>
-                    <include name="hamcrest-core-*.jar"/>
-                    <exclude name="*-sources.jar"/>
-                </fileset>
-            </classpath>
-        </javac>
-        <mkdir dir="${build.dir}/junit"/>
-        <junit printsummary="yes" fork="yes" haltonfailure="yes">
-            <formatter type="plain"/>
-            <classpath>
-                <dirset dir="${build.dir}/classes"/>
-                <dirset dir="${build.dir}/test"/>
-                <fileset dir="${basedir}/lib">
-                    <include name="junit-*.jar"/>
-                    <include name="hamcrest-core-*.jar"/>
-                    <exclude name="*-sources.jar"/>
-                </fileset>
-            </classpath>
-            <batchtest todir="${build.dir}/junit">
-                <fileset dir="test">
-                    <include name="**/*Test*.java"/>
-                    <exclude name="**/*FactoryTest.java"/>
-                    <exclude name="**/AllTests.java"/>
-                </fileset>
-            </batchtest>
-        </junit>
-    </target>
 
-    <target name="all" depends="clean,jar,test,doc"/>
+    <target name="all" depends="clean,jar,doc"/>
 </project>
