@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.akamai</groupId>
-    <version>3.6.1</version>
+    <version>3.6.1-SNAPSHOT</version>
     <artifactId>NetStorageKit</artifactId>
     <packaging>jar</packaging>
     <name>Akamai NetStorageKit</name>
@@ -88,11 +88,41 @@
             </plugins>
         </pluginManagement>
     </build>
+    <profiles>
+        <profile>
+            <id>sonatype-oss-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <scm>
         <url>https://github.com/akamai-open/NetStorageKit-Java</url>
         <connection>scm:git:git://github.com/akamai-open/NetStorageKit-Java.git</connection>
         <developerConnection>scm:git:git@github.com:akamai-open/NetStorageKit-Java.git</developerConnection>
-      <tag>v3.6.1</tag>
+      <tag>HEAD</tag>
   </scm>
     <distributionManagement>
         <snapshotRepository>
