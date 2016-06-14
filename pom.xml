@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.akamai</groupId>
-    <version>3.6.1-SNAPSHOT</version>
+    <version>3.6.1</version>
     <artifactId>NetStorageKit</artifactId>
     <packaging>jar</packaging>
     <name>Akamai NetStorageKit</name>
@@ -92,7 +92,7 @@
         <url>https://github.com/akamai-open/NetStorageKit-Java</url>
         <connection>scm:git:git://github.com/akamai-open/NetStorageKit-Java.git</connection>
         <developerConnection>scm:git:git@github.com:akamai-open/NetStorageKit-Java.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>v3.6.1</tag>
   </scm>
     <distributionManagement>
         <snapshotRepository>
