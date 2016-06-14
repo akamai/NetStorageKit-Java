@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.akamai</groupId>
-    <version>3.7-SNAPSHOT</version>
+    <version>3.6.1-SNAPSHOT</version>
     <artifactId>NetStorageKit</artifactId>
     <packaging>jar</packaging>
     <name>Akamai NetStorageKit</name>
@@ -70,6 +70,19 @@
                     <version>2.5.3</version>
                     <configuration>
                         <tagNameFormat>v@{project.version}</tagNameFormat>
+                        <useReleaseProfile>false</useReleaseProfile>
+                        <arguments>-Psonatype-oss-release</arguments>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonatype.plugins</groupId>
+                    <artifactId>nexus-staging-maven-plugin</artifactId>
+                    <version>${plugin.version}</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <serverId>ossrh</serverId>
+                        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                        <autoReleaseAfterClose>true</autoReleaseAfterClose>
                     </configuration>
                 </plugin>
             </plugins>
@@ -81,4 +94,14 @@
         <developerConnection>scm:git:git@github.com:akamai-open/NetStorageKit-Java.git</developerConnection>
       <tag>HEAD</tag>
   </scm>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 </project>
