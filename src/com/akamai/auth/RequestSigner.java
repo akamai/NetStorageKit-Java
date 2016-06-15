@@ -30,7 +30,7 @@ public interface RequestSigner {
      * @param request the request to sign.
      * @param credential the credential used in the signing.
      * @return the signed request.
-     * @throws RequestSigningException
+     * @throws RequestSigningException general signing exception
      */
     HttpURLConnection sign(HttpURLConnection request, ClientCredential credential) throws RequestSigningException;
 

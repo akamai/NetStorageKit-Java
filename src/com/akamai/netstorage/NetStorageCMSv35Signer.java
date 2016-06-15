@@ -113,7 +113,7 @@ public class NetStorageCMSv35Signer implements RequestSigner {
      * Primary invocation for an API communication. This constructor is used when uploading content is likely
      * <p>
      * Generally, we don't expose that there are other sign versions available and assume it will be HMac-SHA256. However,
-     * this can be overriden in the setSignVersion() method;
+     * this can be overridden in the setSignVersion() method;
      *
      * @param method       an HTTP verb (GET, POST, PUT)
      * @param url          the url to interact with (eg: http://example.akamaihd.net/254462 )
@@ -187,8 +187,8 @@ public class NetStorageCMSv35Signer implements RequestSigner {
 
     /**
      * Computes the value for the the X-Akamai-ACS-Action: header. This is a url query-string encoded separated
-     * list of parameters in the form of name=value&name2=value2. For extensibility purposes, we use generic method
-     * to convert the bean fields & parameters into name-value pairs and encode appropriately
+     * list of parameters in the form of name=value&amp;name2=value2. For extensibility purposes, we use generic method
+     * to convert the bean fields &amp; parameters into name-value pairs and encode appropriately
      *
      * @return a url encoded query string of name-value pairs from the {@link com.akamai.netstorage.APIEventBean}
      */
@@ -200,6 +200,7 @@ public class NetStorageCMSv35Signer implements RequestSigner {
      * Constructs the X-Akamai-ACS-Auth-Data header which contains the signing version, the current time, a random number
      * and the username that is used to sign the data.
      *
+     * @param credential client credentials
      * @return the data field in a comma separated list
      */
     protected String getAuthDataHeaderValue(ClientCredential credential) {
@@ -221,6 +222,7 @@ public class NetStorageCMSv35Signer implements RequestSigner {
      *
      * @param action   action header values {@link #getActionHeaderValue()}
      * @param authData data header values {@link #getAuthDataHeaderValue(ClientCredential credential)}
+     * @param credential user credentials
      * @return a base64 encoded return string
      */
     protected String getAuthSignHeaderValue(String action, String authData, ClientCredential credential) {
@@ -238,6 +240,7 @@ public class NetStorageCMSv35Signer implements RequestSigner {
     /**
      * Assmembles the HTTP Headers necessary for API communication
      *
+     * @param credential user credentials
      * @return Map of name-value pairs representing HTTP Headers and values.
      */
     public Map<String, String> computeHeaders(ClientCredential credential) {
@@ -258,7 +261,7 @@ public class NetStorageCMSv35Signer implements RequestSigner {
      * <p>
      * TODO: catch rate limitting errors. Should delay and retry.
      *
-     * @param connection
+     * @param connection an open url connection
      * @return true if 200 OK response, false otherwise.
      * @throws NetStorageException wrapped exception if it is a recoverable exception
      * @throws IOException         shouldn't be called at this point, but could be triggered when interrogating the response
@@ -282,7 +285,7 @@ public class NetStorageCMSv35Signer implements RequestSigner {
      * @param request    the request to sign.
      * @param credential the credential used in the signing.
      * @return open connection
-     * @throws RequestSigningException
+     * @throws RequestSigningException signing exception
      */
     public HttpURLConnection sign(HttpURLConnection request, ClientCredential credential) throws RequestSigningException {
         try {
@@ -303,10 +306,10 @@ public class NetStorageCMSv35Signer implements RequestSigner {
     /**
      * Opens the connection to Netstorage, assembles the signing headers and uploads any files.
      *
-     * @param request    an open
-     * @param credential
+     * @param request    an open request
+     * @param credential user credentials
      * @return the InputStream from the response if successful
-     * @throws NetStorageException if an error occurred during the communication
+     * @throws RequestSigningException if an error occurred during the communication
      */
     public InputStream execute(HttpURLConnection request, ClientCredential credential) throws RequestSigningException {
         try {

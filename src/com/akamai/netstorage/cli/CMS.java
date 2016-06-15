@@ -40,6 +40,7 @@ public class CMS {
      * Implement the command-line client.
      * @see CMS
      * @param args Command line.
+     * @throws Exception generic exception
      */
     public static void main(String[] args) throws Exception {
         String action = null;

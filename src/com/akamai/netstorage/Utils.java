@@ -248,14 +248,14 @@ public class Utils {
     }
 
     /**
-     * Convert Map<String, String> into a name=value query params string.
-     * <p/>
+     * Convert Map&lt;String, String&gt; into a name=value query params string.
+     * <p>
      * NB: This uses URLEncoding - not URI Encoding for escaping name and values. This
      * shouldn't be an issue for most uses of this function for the Netstorage API, but
      * could impact non-ascii usernames in the future.
      *
      * @param data a Key-Value map
-     * @return a query params encoded string in the form of name=value&name2=value2...
+     * @return a query params encoded string in the form of name=value&amp;name2=value2...
      */
     public static String convertMapAsQueryParams(Map<String, String> data) {
         final StringBuilder result = new StringBuilder();
@@ -277,7 +277,7 @@ public class Utils {
      * Simple utility to read to the end of a stream when you don't particularly care for the contents of the stream.
      * This is useful when you want to re-use URLConnections but need to make sure that the streams are properly flushed.
      * @param stream the open InputStream
-     * @throws IOException
+     * @throws IOException inputs tream read exception
      */
     public static void readToEnd(InputStream stream) throws IOException {
         if (stream == null) return;
@@ -291,7 +291,7 @@ public class Utils {
      * @param srcFile File of the inputstream
      * @param section the ini [section] name to read the properties from
      * @return the Properties for the section
-     * @throws IOException
+     * @throws IOException inputs tream read exception
      */
     public static Properties readIniSection(File srcFile, String section) throws IOException {
         if (!srcFile.exists()) throw new FileNotFoundException(String.format("Src file is not accessible %s", srcFile.toString()));
@@ -305,7 +305,7 @@ public class Utils {
      * @param inputStream stream
      * @param section the ini [section] name to read the properties from
      * @return the Properties for the section
-     * @throws IOException
+     * @throws IOException inputs tream read exception
      */
     public static Properties readIniSection(InputStream inputStream, String section) throws IOException {
         //make sure we close the streams when we are done
