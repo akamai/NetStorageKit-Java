@@ -1,6 +1,6 @@
 # NetStorageKit (for Java)
 
-This library assists in the interaction with Akamai's NetStorage CMS API. The following CMS API Specs can are available:
+This library assists in the interaction with Akamai's NetStorage CMS API. The following CMS API Specs are available:
 
 * [FileStore-format](https://control.akamai.com/dl/customers/NS/NS_http_api_FS.pdf)
 * [ObjectStore-format](https://control.akamai.com/dl/customers/NS/NS_http_api_OS.pdf)
