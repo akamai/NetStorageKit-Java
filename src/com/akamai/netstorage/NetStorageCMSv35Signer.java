@@ -56,6 +56,10 @@ public class NetStorageCMSv35Signer implements RequestSigner {
     private static final String AUTH_DATA_HEADER = "X-Akamai-ACS-Auth-Data";
     private static final String AUTH_SIGN_HEADER = "X-Akamai-ACS-Auth-Sign";
 
+    // defaults
+    private int connectTimeout = 10000;
+    private int readTimeout = 10000;
+
 	/**
 	 * There are multiple types of Net Storage. The following types are
 	 * detected:
@@ -106,7 +110,7 @@ public class NetStorageCMSv35Signer implements RequestSigner {
      * @param params the set of bean parameters to be sent in the API request
      */
     public NetStorageCMSv35Signer(String method, URL url, APIEventBean params) {
-        this(method, url, params, null, -1L);
+        this(method, url, params, null, -1L, 10000, 10000);
     }
 
     /**
@@ -121,13 +125,15 @@ public class NetStorageCMSv35Signer implements RequestSigner {
      * @param uploadStream the inputStream to read the bytes to upload
      * @param uploadSize   if available, the total size of the inputStream. Note, that this could be different than the Size parameter in the action line
      */
-    public NetStorageCMSv35Signer(String method, URL url, APIEventBean params, InputStream uploadStream, long uploadSize) {
+    public NetStorageCMSv35Signer(String method, URL url, APIEventBean params, InputStream uploadStream, long uploadSize, int connectTimeout, int readTimeout) {
         this.setMethod(method);
         this.setUrl(url);
         this.setParams(params);
         this.setUploadStream(uploadStream);
         this.setUploadSize(uploadSize);
         this.setSignVersion(SignType.HMACSHA256);
+        this.setConnectTimeout(connectTimeout);
+        this.setReadTimeout(readTimeout);
     }
 
     private String method;
@@ -183,6 +189,22 @@ public class NetStorageCMSv35Signer implements RequestSigner {
 
     public void setSignVersion(SignType signVersion) {
         this.signVersion = signVersion;
+    }
+
+    public void setConnectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
+    }
+
+    public int getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public void setReadTimeout(int readTimeout) {
+        this.readTimeout = readTimeout;
+    }
+
+    public int getReadTimeout() {
+        return readTimeout;
     }
 
     /**
@@ -314,8 +336,8 @@ public class NetStorageCMSv35Signer implements RequestSigner {
     public InputStream execute(HttpURLConnection request, ClientCredential credential) throws RequestSigningException {
         try {
             request = sign(request, credential);
-            request.setConnectTimeout(10000);
-            request.setReadTimeout(10000);
+            request.setConnectTimeout(this.getConnectTimeout());
+            request.setReadTimeout(this.getReadTimeout());
 
             if (this.getMethod().equals("PUT") || this.getMethod().equals("POST")) {
                 request.setDoOutput(true);
