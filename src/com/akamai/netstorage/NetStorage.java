@@ -53,8 +53,8 @@ public class NetStorage {
 
     public NetStorage(DefaultCredential credential, int connectTimeout, int readTimeout) {
         this.credential = credential;
-        this.connectTimeout = connectTimeout;
-        this.readTimeout = readTimeout;
+        if (connectTimeout > 0) this.setConnectTimeout(connectTimeout);
+        if (readTimeout > 0) this.setReadTimeout(readTimeout);
     }
 
     protected URL getNetstorageUri(String path) {

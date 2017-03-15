@@ -110,7 +110,7 @@ public class NetStorageCMSv35Signer implements RequestSigner {
      * @param params the set of bean parameters to be sent in the API request
      */
     public NetStorageCMSv35Signer(String method, URL url, APIEventBean params) {
-        this(method, url, params, null, -1L, 10000, 10000);
+        this(method, url, params, null, -1L, -1, -1);
     }
 
     /**
@@ -132,8 +132,8 @@ public class NetStorageCMSv35Signer implements RequestSigner {
         this.setUploadStream(uploadStream);
         this.setUploadSize(uploadSize);
         this.setSignVersion(SignType.HMACSHA256);
-        this.setConnectTimeout(connectTimeout);
-        this.setReadTimeout(readTimeout);
+        if (connectTimeout > 0) this.setConnectTimeout(connectTimeout);
+        if (readTimeout > 0) this.setReadTimeout(readTimeout);
     }
 
     private String method;
@@ -295,7 +295,8 @@ public class NetStorageCMSv35Signer implements RequestSigner {
         // Validate Server-Time drift
         Date currentDate = new Date();
         long responseDate = connection.getHeaderFieldDate("Date", 0);
-        if (responseDate != 0 && currentDate.getTime() - responseDate > 30 * 1000)
+        if ((responseDate != 0 && currentDate.getTime() - responseDate > 30 * 1000)
+            || (responseDate != 0 && (currentDate.getTime() - responseDate) * -1 > 30 * 1000))
             throw new NetStorageException("Local server Date is more than 30s out of sync with Remote server");
 
         // generic response

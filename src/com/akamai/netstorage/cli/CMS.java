@@ -98,7 +98,13 @@ public class CMS {
                 netstorageURI = arg;
             else
                 firstarg = arg;
-        execute(action, user, key, netstorageURI, uploadfile, outputfile, targetFilename, dstFilename, indexZip, connectTimeout,readTimeout);
+
+        try {
+            execute(action, user, key, netstorageURI, uploadfile, outputfile, targetFilename, dstFilename, indexZip, connectTimeout,readTimeout);
+        } catch (NetStorageException e) {
+            System.out.println(e.getMessage());
+            throw e;
+        }
     }
 
     public static void execute(String action, String user, String key, String netstorageURI,
