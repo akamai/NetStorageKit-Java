@@ -21,7 +21,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -130,7 +130,8 @@ public class UtilsTest extends Utils {
         assertTrue(data.containsKey("newValue"));
         assertNull(data.get("newValue"));
 
-        data = Utils.convertObjectAsMap(new POJO("value1", null, DateFormat.getDateTimeInstance(1, 1, Locale.UK).parse("11 November 2013 00:00:00 GMT")));
+    	SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm:ss z", Locale.UK);
+        data = Utils.convertObjectAsMap(new POJO("value1", null, sdf.parse("11 November 2013 00:00:00 GMT")));
         assertEquals(data.size(), 3);
         assertTrue(data.containsKey("name"));
         assertEquals(data.get("name"), "value1");
