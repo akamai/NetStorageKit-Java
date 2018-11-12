@@ -15,6 +15,7 @@
  */
 package com.akamai.netstorage;
 
+import com.akamai.auth.RequestSigner;
 import com.akamai.auth.RequestSigningException;
 
 import static com.akamai.netstorage.Utils.readToEnd;
@@ -59,17 +60,23 @@ public class NetStorage {
 
     protected InputStream execute(String method, String path, APIEventBean acsParams, InputStream uploadStream, Long size) throws NetStorageException {
         try {
-            return new NetStorageCMSv35Signer(
-                    method,
-                    this.getNetstorageUri(path),
-                    acsParams,
-                    uploadStream,
-                    size != null && size > 0 ? size : -1
-            ).execute(this.credential);
+            return createRequestSigner(method, path, acsParams, uploadStream, size).execute(this.credential);
         }
         catch (RequestSigningException ex) {
             throw new NetStorageException(ex);
         }
+    }
+
+    protected RequestSigner createRequestSigner(String method, String path, APIEventBean acsParams,
+                                              InputStream uploadStream, Long size)
+    {
+        return new NetStorageCMSv35Signer(
+                method,
+                this.getNetstorageUri(path),
+                acsParams,
+                uploadStream,
+                size != null && size > 0 ? size : -1
+        );
     }
 
     public NetStorageType getNetStorageType() throws NetStorageException {
