@@ -15,6 +15,11 @@
  */
 package com.akamai.netstorage;
 
+import com.akamai.netstorage.parameter.Parameter;
+import com.akamai.netstorage.parameter.ParameterValueFormatter;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -33,12 +38,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import com.akamai.netstorage.parameter.Parameter;
-import com.akamai.netstorage.parameter.ParameterValueFormatter;
-
 /**
  * General utility functions needed to implement the HTTP SDK.  Many of these functions are also
  * available as standard parts of other libraries, but this package strives to operate without any
@@ -53,7 +52,7 @@ public class Utils {
     /**
      * An enum of the hash algorithms supported by {@link #computeHash(java.io.InputStream, com.akamai.netstorage.Utils.HashAlgorithm)}
      * Currently supported hashes include MD5; SHA1; SHA256
-     *
+     * <p>
      * The string representation matches the java {@link java.security.MessageDigest#getInstance(String)} canonical names.
      */
     public enum HashAlgorithm {
@@ -77,7 +76,7 @@ public class Utils {
     /**
      * An enum of the keyed-hash algorithms supported by {@link #computeKeyedHash(byte[], String, com.akamai.netstorage.Utils.KeyedHashAlgorithm)}
      * Currently supported hashes include HMAC-MD5; HMAC-SHA1; HMAC-SHA256
-     *
+     * <p>
      * The string representation matches the java {@link javax.crypto.Mac#getInstance(String)}} cononical names.
      */
     public enum KeyedHashAlgorithm {
@@ -102,8 +101,8 @@ public class Utils {
     /**
      * Computes the hash of a given InputStream. This is a wrapper over the MessageDigest crypto functions.
      *
-     * @param srcStream a source stream. This will be wrapped in a {@link java.io.BufferedInputStream}
-     *                  in case the source stream is not buffered
+     * @param srcStream     a source stream. This will be wrapped in a {@link java.io.BufferedInputStream}
+     *                      in case the source stream is not buffered
      * @param hashAlgorithm the Algorithm to use to compute the hash
      * @return a byte[] representation of the hash. If the InputStream is a null object
      * then null will be returned. If the InputStream is empty an empty byte[] {} will be returned.
@@ -130,8 +129,9 @@ public class Utils {
 
     /**
      * Computes the HMAC hash of a given byte[]. This is a wrapper over the Mac crypto functions.
-     * @param data byte[] of content to hash
-     * @param key secret key to salt the hash
+     *
+     * @param data     byte[] of content to hash
+     * @param key      secret key to salt the hash
      * @param hashType determines which alogirthm to use. The recommendation is to use HMAC-SHA256
      * @return a byte[] presenting the HMAC hash of the source data.
      */
@@ -150,6 +150,7 @@ public class Utils {
     /**
      * Hex encoding wrapper for a byte array. The output will be 2 character padded
      * string in lower case.
+     *
      * @param value a byte array to encode. The assumption is that the string to encode
      *              is small enough to be held in memory without streaming the encoding
      * @return a 2 character zero padded string in lower case
@@ -177,7 +178,7 @@ public class Utils {
         //TODO: JDK8 Use java.util.Base64.Encoder(value);
         if (value == null) return null;
 
-        StringBuilder result = new StringBuilder("");
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < value.length; i += 3) {
             int v;
             int c = 2;
@@ -210,15 +211,15 @@ public class Utils {
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(srcObj.getClass());
             PropertyDescriptor[] properties = beanInfo.getPropertyDescriptors();
+            HashMap<String, Field> fields = getDeclaredFields(srcObj.getClass());
             for (PropertyDescriptor property : properties) {
                 String name = property.getName();
 
-                //getClass() should not be included;
                 if (name.equals("class") || name.equals("additionalParams")) continue;
 
                 ParameterValueFormatter formatter = null;
                 boolean includeNull = false;
-                Field field = srcObj.getClass().getDeclaredField(name);
+                Field field = fields.get(name);
                 Parameter p = field.getAnnotation(Parameter.class);
                 if (p != null && p.name() != null) {
                     name = p.name();
@@ -241,10 +242,21 @@ public class Utils {
                 if (includeNull || value != null) resultMap.put(name, value);
 
             }
-        } catch (IntrospectionException | NoSuchFieldException | IllegalAccessException | InvocationTargetException e) {
+        } catch (IntrospectionException | IllegalAccessException | InvocationTargetException e) {
             log.log(Level.SEVERE, "Object serialization error", e);
         }
         return resultMap;
+    }
+
+    private static HashMap<String, Field> getDeclaredFields(Class<?> aClass) {
+        HashMap<String, Field> map = new HashMap<>();
+        while (aClass != null) {
+            for (Field field : aClass.getDeclaredFields()) {
+                map.put(field.getName(), field);
+            }
+            aClass = aClass.getSuperclass();
+        }
+        return map;
     }
 
     /**
@@ -276,6 +288,7 @@ public class Utils {
     /**
      * Simple utility to read to the end of a stream when you don't particularly care for the contents of the stream.
      * This is useful when you want to re-use URLConnections but need to make sure that the streams are properly flushed.
+     *
      * @param stream the open InputStream
      * @throws IOException inputs tream read exception
      */
@@ -283,18 +296,21 @@ public class Utils {
         if (stream == null) return;
 
         byte[] buffer = new byte[1024 * 1024];
-        while (stream.read(buffer) > 0) {}
+        while (stream.read(buffer) > 0) {
+        }
     }
 
     /**
      * Convenience method to read Properties in Ini format
+     *
      * @param srcFile File of the inputstream
      * @param section the ini [section] name to read the properties from
      * @return the Properties for the section
      * @throws IOException inputs tream read exception
      */
     public static Properties readIniSection(File srcFile, String section) throws IOException {
-        if (!srcFile.exists()) throw new FileNotFoundException(String.format("Src file is not accessible %s", srcFile.toString()));
+        if (!srcFile.exists())
+            throw new FileNotFoundException(String.format("Src file is not accessible %s", srcFile.toString()));
         try (InputStream inputStream = new BufferedInputStream(new FileInputStream(srcFile))) {
             return readIniSection(inputStream, section);
         }
@@ -302,8 +318,9 @@ public class Utils {
 
     /**
      * Convenience method to read Properties in Ini format
+     *
      * @param inputStream stream
-     * @param section the ini [section] name to read the properties from
+     * @param section     the ini [section] name to read the properties from
      * @return the Properties for the section
      * @throws IOException inputs tream read exception
      */
