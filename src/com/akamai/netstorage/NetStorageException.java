@@ -28,12 +28,12 @@ public class NetStorageException extends RequestSigningException {
 	private static final long serialVersionUID = 5716437270940718895L;
 	private int responseCode = -1;
 
-	public NetStorageException(String message) {
+    public NetStorageException(String message) {
         super(message);
     }
 
     public NetStorageException(Throwable cause) {
-        super(cause);
+        this(cause.getMessage(), cause);
     }
 
 	public NetStorageException(String message, int responseCode) {
