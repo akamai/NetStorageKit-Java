@@ -312,10 +312,23 @@ public class NetStorageCMSv35Signer implements RequestSigner {
      * @throws RequestSigningException if an error occurred during the communication
      */
     public InputStream execute(HttpURLConnection request, ClientCredential credential) throws RequestSigningException {
+        return execute(request, credential, 10000);
+    }
+
+    /**
+     * Opens the connection to Netstorage, assembles the signing headers and uploads any files.
+     *
+     * @param request    an open request
+     * @param credential user credentials
+     * @param readTimeout read timeout
+     * @return the InputStream from the response if successful
+     * @throws RequestSigningException if an error occurred during the communication
+     */
+    public InputStream execute(HttpURLConnection request, ClientCredential credential, int readTimeout) throws RequestSigningException {
         try {
             request = sign(request, credential);
             request.setConnectTimeout(10000);
-            request.setReadTimeout(10000);
+            request.setReadTimeout(readTimeout);
 
             if (this.getMethod().equals("PUT") || this.getMethod().equals("POST")) {
                 request.setDoOutput(true);
