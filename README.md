@@ -27,18 +27,23 @@ This library assists in the interaction with Akamai's NetStorage CMS API. The fo
 For example, to delete a file:
 ```
 import com.akamai.netstorage.NetStorage;
+import com.akamai.netstorage.DefaultCredential;
 
-NetStorage ns = new NetStorage("example.akamaihd.net", "user1", "1234abcd");
-ns.delete("/1234/example.zip");
+DefaultCredential credential = new DefaultCredential("example.akamaihd.net","id of your upload account", "apiKey of upload account");
+
+NetStorage ns = new NetStorage(credential);
+ns.delete("/[CP Code]/example.zip");
 ```
 
 Other methods return an `InputStream`. For example, to retrieve a directory listing:
 
 ```
 import com.akamai.netstorage.NetStorage;
-NetStorage ns = new NetStorage("example.akamaihd.net", "user1", "1234abcd");
+import com.akamai.netstorage.DefaultCredential;
+DefaultCredential credential = new DefaultCredential("example.akamaihd.net","id of your upload account", "apiKey of upload account");
+NetStorage ns = new NetStorage(credential);
 
-try (InputStream result = ns.dir("/1234")) {
+try (InputStream result = ns.dir("/[CP code]/1234")) {
  // TODO: consume InputStream
 }
 ```
@@ -46,9 +51,10 @@ try (InputStream result = ns.dir("/1234")) {
 Finally, when uploading a `File` object can be sent or an open `InputStream` wll be used
 ```
 import com.akamai.netstorage.NetStorage;
-
-NetStorage ns = new NetStorage("example.akamaihd.net", "user1", "1234abcd");
-try (InputStream result = ns.upload("/1234/example.zip", new File("../workingdir/srcfile.zip"))) {
+import com.akamai.netstorage.DefaultCredential;
+DefaultCredential credential = new DefaultCredential("example.akamaihd.net","id of your upload account", "apiKey of upload account");
+NetStorage ns = new NetStorage(credential);
+try (InputStream result = ns.upload("/[CP code]/1234/example.zip", new File("../workingdir/srcfile.zip"))) {
  // TODO: consume InputStream
 }
 ```
