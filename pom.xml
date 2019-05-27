@@ -3,7 +3,7 @@
 
     <groupId>com.akamai</groupId>
     <version>3.6.7-SNAPSHOT</version>
-    <artifactId>NetStorageKit</artifactId>
+    <artifactId>NetStorageKit-Java</artifactId>
     <packaging>jar</packaging>
     <name>Akamai NetStorageKit</name>
 

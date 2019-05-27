@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -36,7 +37,8 @@ import static org.junit.Assert.assertThat;
 public class APIEventBeanTest {
     @Test
     public void testUploadZipAsQueryParams() throws Exception {
-        Date date = DateFormat.getDateTimeInstance(1, 1, Locale.UK).parse("11 November 2013 00:00:00 GMT");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm:ss z", Locale.UK);
+        Date date = sdf.parse("11 November 2013 00:00:00 GMT");
         APIEventBean action = new APIEventUpload().withMtime(date).ofSize(123L).isIndexZip(true);
 
         Map<String, String> result = action.asQueryParams();
@@ -47,7 +49,8 @@ public class APIEventBeanTest {
 
     @Test
     public void testUploadNoZipAsQueryParams() throws Exception {
-        Date date = DateFormat.getDateTimeInstance(1, 1, Locale.UK).parse("11 November 2013 00:00:00 GMT");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm:ss z", Locale.UK);
+        Date date = sdf.parse("11 November 2013 00:00:00 GMT");
         APIEventBean action = new APIEventUpload().withMtime(date).ofSize(123L).isIndexZip(false);
 
         Map<String, String> result = action.asQueryParams();
