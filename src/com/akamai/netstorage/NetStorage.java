@@ -81,7 +81,11 @@ public class NetStorage {
             ).execute(this.credential);
         }
         catch (RequestSigningException ex) {
-            return createRequestSigner(method, path, acsParams, uploadStream, size).execute(this.credential);
+            try {
+                return createRequestSigner(method, path, acsParams, uploadStream, size).execute(this.credential);
+            } catch (RequestSigningException e) {
+                throw new NetStorageException(ex);
+            }
         }
     }
 
@@ -92,7 +96,9 @@ public class NetStorage {
                 this.getNetstorageUri(path),
                 acsParams,
                 uploadStream,
-                size != null && size > 0 ? size : -1
+                size != null && size > 0 ? size : -1,
+                this.getConnectTimeout(),
+                this.getReadTimeout()
         );
     }
 
