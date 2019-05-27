@@ -26,7 +26,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
@@ -156,7 +156,8 @@ public class NetStorageTest {
         NetStorage ns = createNetstorage(path);
         HttpURLConnectionTest connection = URLStreamHandlerFactoryTest.getURLConnection(ns.getNetstorageUri(path));
         Map<String, String> headers = connection.getRequestHeaders();
-        Date mtime = DateFormat.getDateTimeInstance(1, 1, Locale.UK).parse("11 November 2013 00:00:00 GMT");
+    	SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm:ss z", Locale.UK);
+        Date mtime = sdf.parse("11 November 2013 00:00:00 GMT");
 
         ns.mtime(path, mtime);
         assertEquals(headers.size(), 4);
@@ -258,7 +259,8 @@ public class NetStorageTest {
         Map<String, String> headers = connection.getRequestHeaders();
         ByteArrayOutputStream requestStream = (ByteArrayOutputStream) connection.getOutputStream();
 
-        Date mtime = DateFormat.getDateTimeInstance(1, 1, Locale.UK).parse("11 November 2013 00:00:00 GMT");
+    	SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm:ss z", Locale.UK);
+        Date mtime = sdf.parse("11 November 2013 00:00:00 GMT");
         byte[] data = "Lorem ipsum dolor sit amet, an sea putant quaeque, homero aperiam te eos.".getBytes(StandardCharsets.UTF_8);
 
         InputStream stream = new ByteArrayInputStream(data);
@@ -312,7 +314,8 @@ public class NetStorageTest {
     public void testUploadFile() throws Exception {
 
         String path = "/foobar";
-        Date mtime = DateFormat.getDateTimeInstance(1, 1, Locale.UK).parse("11 November 2013 00:00:00 GMT");
+    	SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm:ss z", Locale.UK);
+        Date mtime = sdf.parse("11 November 2013 00:00:00 GMT");
         byte[] data = "Lorem ipsum dolor sit amet, an sea putant quaeque, homero aperiam te eos.".getBytes(StandardCharsets.UTF_8);
 
         File tmpFile = null;

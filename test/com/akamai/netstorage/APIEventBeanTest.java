@@ -18,7 +18,7 @@ package com.akamai.netstorage;
 import static org.junit.Assert.assertEquals;
 
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -34,7 +34,8 @@ import org.junit.Test;
 public class APIEventBeanTest {
     @Test
     public void testAsQueryParams() throws Exception {
-        Date date = DateFormat.getDateTimeInstance(1, 1, Locale.UK).parse("11 November 2013 00:00:00 GMT");
+    	SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm:ss z", Locale.UK);
+        Date date = sdf.parse("11 November 2013 00:00:00 GMT");
         APIEventBean action = new APIEventBean();
         action.setAction("download");
         action.setFormat("xml");

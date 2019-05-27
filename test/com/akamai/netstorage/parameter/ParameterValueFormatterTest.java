@@ -18,7 +18,7 @@ package com.akamai.netstorage.parameter;
 
 import org.junit.Test;
 
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
@@ -48,7 +48,8 @@ public class ParameterValueFormatterTest {
     @Test
     public void testDateValueFormatter() throws Exception {
         ParameterValueFormatter formatter = new DateValueFormatter();
-        Date data = DateFormat.getDateTimeInstance(1, 1, Locale.UK).parse("11 November 2013 00:00:00 GMT");
+    	SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm:ss z", Locale.UK);
+        Date data = sdf.parse("11 November 2013 00:00:00 GMT");
         assertEquals(formatter.valueOf(data), "1384128000");
     }
 
