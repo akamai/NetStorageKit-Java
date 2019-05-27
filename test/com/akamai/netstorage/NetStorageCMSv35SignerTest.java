@@ -159,13 +159,24 @@ public class NetStorageCMSv35SignerTest {
     }
 
     @Test
-    public void testValidateServerDateOutOfSync() throws Exception {
+    public void testValidateServerDateOutOfSyncPast() throws Exception {
         exception.expect(NetStorageException.class);
         exception.expectMessage("Local server Date is more than 30s out of sync with Remote server");
         NetStorageCMSv35Signer netStorageCMSv35Signer = createAPIConnection();
         HttpURLConnectionTest httpURLConnection = new HttpURLConnectionTest(netStorageCMSv35Signer.getUrl());
         httpURLConnection.setResponseCode(HttpURLConnection.HTTP_UNAVAILABLE);
         httpURLConnection.getHeaderFields().put("Date", Collections.singletonList("Mon, 11 Nov 1918 11:00:00 GMT"));
+        assertTrue(netStorageCMSv35Signer.validate(httpURLConnection));
+    }
+
+    @Test
+    public void testValidateServerDateOutOfSyncFuture() throws Exception {
+        exception.expect(NetStorageException.class);
+        exception.expectMessage("Local server Date is more than 30s out of sync with Remote server");
+        NetStorageCMSv35Signer netStorageCMSv35Signer = createAPIConnection();
+        HttpURLConnectionTest httpURLConnection = new HttpURLConnectionTest(netStorageCMSv35Signer.getUrl());
+        httpURLConnection.setResponseCode(HttpURLConnection.HTTP_UNAVAILABLE);
+        httpURLConnection.getHeaderFields().put("Date", Collections.singletonList("Wed, 1 Jan 3000 11:00:00 GMT"));
         assertTrue(netStorageCMSv35Signer.validate(httpURLConnection));
     }
 

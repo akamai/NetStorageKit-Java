@@ -46,7 +46,10 @@ public class NetStorageTest {
 
         URLStreamHandlerFactoryTest.init();
 
-        NetStorage ns = new NetStorage(new DefaultCredential("www.example.com", "user1", "secret1"));
+        NetStorage ns = new NetStorage(new DefaultCredential("www.example.com", "user1", "secret1"), 20000, 20000);
+
+        assertEquals(ns.getConnectTimeout(), 20000);
+        assertEquals(ns.getReadTimeout(), 20000);
 
         HttpURLConnectionTest connection = URLStreamHandlerFactoryTest.addURLConnection(ns.getNetstorageUri(path));
         connection.setResponseCode(HttpURLConnection.HTTP_OK);
