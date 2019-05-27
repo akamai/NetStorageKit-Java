@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import java.lang.Integer;
 
 import com.akamai.netstorage.DefaultCredential;
 import com.akamai.netstorage.NetStorage;
@@ -51,6 +52,8 @@ public class CMS {
         String outputfile = null;
         String targetFilename = null;
         String dstFilename = null;
+        int connectTimeout = 10000;
+        int readTimeout = 10000;
         boolean indexZip = false;
 
 
@@ -82,6 +85,11 @@ public class CMS {
                     case "-d":
                         dstFilename = arg;
                         break;
+                    case "-c":
+                        connectTimeout = Integer.parseInt(arg);
+                    case "-r":
+                        readTimeout = Integer.parseInt(arg);
+                        break;
                 }
                 firstarg = null;
             } else if (arg.equals("-indexzip"))
@@ -90,11 +98,18 @@ public class CMS {
                 netstorageURI = arg;
             else
                 firstarg = arg;
-        execute(action, user, key, netstorageURI, uploadfile, outputfile, targetFilename, dstFilename, indexZip);
+
+        try {
+            execute(action, user, key, netstorageURI, uploadfile, outputfile, targetFilename, dstFilename, indexZip, connectTimeout,readTimeout);
+        } catch (NetStorageException e) {
+            System.out.println(e.getMessage());
+            throw e;
+        }
     }
 
     public static void execute(String action, String user, String key, String netstorageURI,
-                        String uploadfile, String outputfile, String target, String dst, boolean indexZip) throws NetStorageException, IOException {
+                        String uploadfile, String outputfile, String target, String dst, boolean indexZip,
+                        int connectTimeout, int readTimeout) throws NetStorageException, IOException {
 
         String host = null;
         String path = netstorageURI;
@@ -118,7 +133,7 @@ public class CMS {
             host = hostpath[0];
             path = "/" + hostpath[1];
         }
-        NetStorage ns = new NetStorage(new DefaultCredential(host, user, key));
+        NetStorage ns = new NetStorage(new DefaultCredential(host, user, key), connectTimeout, readTimeout);
         InputStream result = null;
         boolean success = true;
 
@@ -211,6 +226,7 @@ public class CMS {
                 + "Usage: cms <-a action> <-u user> <-k key>\n"
                 + "[-o outfile] [-f srcfile]\n"
                 + "[-t targetpath] [-d newpath]\n"
+                + "[-c connectTimeout] [-r readTimeout]\n"
                 + "<-indexzip> <host/path>\n"
                 + "\n"
                 + "Where:\n"
@@ -219,6 +235,8 @@ public class CMS {
                 + "key             unique key used to sign api requests\n"
                 + "outfile         local file name to write when action=download\n"
                 + "srcfile         local file used as source when action=upload\n"
+                + "connectTimeout  http connect timeout in milliseconds\n"
+                + "readTimeout     http read timeout in milliseconds - useful when uploading via proxy\n"
                 + "targetpath      the absolute path (/1234/example.jpg) pointing to the existing target when action=symlink\n"
                 + "newpath         the absolute path (/1234/example.jpg) for the new file when action=rename\n"
                 + "host/path       the netstorage hostname and path to the file being manipulated (example.akamaihd.net/1234/example.jpg)\n"

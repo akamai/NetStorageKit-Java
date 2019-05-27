@@ -44,8 +44,18 @@ public class NetStorage {
 
     private DefaultCredential credential;
 
+    // defaults
+    private int connectTimeout = 10000;
+    private int readTimeout = 10000;
+
     public NetStorage(DefaultCredential credential) {
         this.credential = credential;
+    }
+
+    public NetStorage(DefaultCredential credential, int connectTimeout, int readTimeout) {
+        this.credential = credential;
+        if (connectTimeout > 0) this.setConnectTimeout(connectTimeout);
+        if (readTimeout > 0) this.setReadTimeout(readTimeout);
     }
 
     protected URL getNetstorageUri(String path) {
@@ -60,9 +70,18 @@ public class NetStorage {
 
     protected InputStream execute(String method, String path, APIEventBean acsParams, InputStream uploadStream, Long size) throws NetStorageException {
         try {
+            return new NetStorageCMSv35Signer(
+                    method,
+                    this.getNetstorageUri(path),
+                    acsParams,
+                    uploadStream,
+                    size != null && size > 0 ? size : -1,
+                    this.getConnectTimeout(),
+                    this.getReadTimeout()
+            ).execute(this.credential);
+        }
+        catch (RequestSigningException ex) {
             return createRequestSigner(method, path, acsParams, uploadStream, size).execute(this.credential);
-        } catch (RequestSigningException ex) {
-            throw new NetStorageException(ex);
         }
     }
 
@@ -255,6 +274,22 @@ public class NetStorage {
             readToEnd(inputStream);
         }
         return true;
+    }
+
+    public void setConnectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
+    }
+
+    public int getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public void setReadTimeout(int readTimeout) {
+        this.readTimeout = readTimeout;
+    }
+
+    public int getReadTimeout() {
+        return readTimeout;
     }
 
 }
